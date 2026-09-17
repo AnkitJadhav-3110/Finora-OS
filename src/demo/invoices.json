@@ -1,0 +1,765 @@
+[
+  {
+    "id": "inv-1",
+    "invoiceNumber": "FIN-2026-0001",
+    "businessId": "demo-finora-tech",
+    "clientId": "client-acme",
+    "items": [
+      { "id": "item-1", "description": "Finora Engine Core License", "quantity": 1, "price": 4999.00, "taxRate": 18, "discount": 0 },
+      { "id": "item-2", "description": "SAML Single Sign-On Connector", "quantity": 1, "price": 1500.00, "taxRate": 18, "discount": 0 }
+    ],
+    "subtotal": 6499.00,
+    "taxTotal": 1169.82,
+    "discountTotal": 0.00,
+    "total": 7668.82,
+    "status": "paid",
+    "template": "corporate",
+    "createdAt": "2026-01-15T10:00:00Z",
+    "dueDate": "2026-02-15T10:00:00Z",
+    "isPaid": true,
+    "notes": "Thank you for your business!"
+  },
+  {
+    "id": "inv-2",
+    "invoiceNumber": "FIN-2026-0002",
+    "businessId": "demo-finora-tech",
+    "clientId": "client-stellar",
+    "items": [
+      { "id": "item-3", "description": "Interactive UI/UX Design Sprint", "quantity": 1, "price": 3200.00, "taxRate": 18, "discount": 10 }
+    ],
+    "subtotal": 3200.00,
+    "taxTotal": 518.40,
+    "discountTotal": 320.00,
+    "total": 3398.40,
+    "status": "paid",
+    "template": "modern",
+    "createdAt": "2026-01-20T11:00:00Z",
+    "dueDate": "2026-02-04T11:00:00Z",
+    "isPaid": true,
+    "notes": "Introductory design sprint discount applied."
+  },
+  {
+    "id": "inv-3",
+    "invoiceNumber": "FIN-2026-0003",
+    "businessId": "demo-finora-tech",
+    "clientId": "client-orbit",
+    "items": [
+      { "id": "item-4", "description": "Senior Fullstack Engineer (Hourly)", "quantity": 40, "price": 150.00, "taxRate": 18, "discount": 0 }
+    ],
+    "subtotal": 6000.00,
+    "taxTotal": 1080.00,
+    "discountTotal": 0.00,
+    "total": 7080.00,
+    "status": "paid",
+    "template": "minimal",
+    "createdAt": "2026-01-25T14:00:00Z",
+    "dueDate": "2026-02-25T14:00:00Z",
+    "isPaid": true,
+    "notes": "January consulting hours."
+  },
+  {
+    "id": "inv-4",
+    "invoiceNumber": "FIN-2026-0004",
+    "businessId": "demo-finora-tech",
+    "clientId": "client-pixel",
+    "items": [
+      { "id": "item-5", "description": "Analytical Dashboard Plug-in", "quantity": 2, "price": 899.00, "taxRate": 18, "discount": 0 }
+    ],
+    "subtotal": 1798.00,
+    "taxTotal": 323.64,
+    "discountTotal": 0.00,
+    "total": 2121.64,
+    "status": "paid",
+    "template": "creative",
+    "createdAt": "2026-02-02T09:00:00Z",
+    "dueDate": "2026-02-17T09:00:00Z",
+    "isPaid": true,
+    "notes": ""
+  },
+  {
+    "id": "inv-5",
+    "invoiceNumber": "FIN-2026-0005",
+    "businessId": "demo-finora-tech",
+    "clientId": "client-apex",
+    "items": [
+      { "id": "item-6", "description": "Enterprise Mobile SDK", "quantity": 1, "price": 2500.00, "taxRate": 18, "discount": 0 },
+      { "id": "item-7", "description": "Senior Fullstack Engineer (Hourly)", "quantity": 20, "price": 150.00, "taxRate": 18, "discount": 0 }
+    ],
+    "subtotal": 5500.00,
+    "taxTotal": 990.00,
+    "discountTotal": 0.00,
+    "total": 6490.00,
+    "status": "paid",
+    "template": "corporate",
+    "createdAt": "2026-02-10T16:00:00Z",
+    "dueDate": "2026-03-12T16:00:00Z",
+    "isPaid": true,
+    "notes": "Custom system integration launch package."
+  },
+  {
+    "id": "inv-6",
+    "invoiceNumber": "FIN-2026-0006",
+    "businessId": "demo-finora-tech",
+    "clientId": "client-quantum",
+    "items": [
+      { "id": "item-8", "description": "Senior Fullstack Engineer (Hourly)", "quantity": 80, "price": 150.00, "taxRate": 18, "discount": 0 }
+    ],
+    "subtotal": 12000.00,
+    "taxTotal": 2160.00,
+    "discountTotal": 0.00,
+    "total": 14160.00,
+    "status": "paid",
+    "template": "corporate",
+    "createdAt": "2026-02-15T11:00:00Z",
+    "dueDate": "2026-04-16T11:00:00Z",
+    "isPaid": true,
+    "notes": "HIPAA system analytics dashboard development block."
+  },
+  {
+    "id": "inv-7",
+    "invoiceNumber": "FIN-2026-0007",
+    "businessId": "demo-finora-tech",
+    "clientId": "client-nexus",
+    "items": [
+      { "id": "item-9", "description": "Automated Billing API Gateway", "quantity": 1, "price": 1200.00, "taxRate": 18, "discount": 0 },
+      { "id": "item-10", "description": "Custom PDF Report Generator", "quantity": 1, "price": 450.00, "taxRate": 18, "discount": 0 }
+    ],
+    "subtotal": 1650.00,
+    "taxTotal": 297.00,
+    "discountTotal": 0.00,
+    "total": 1947.00,
+    "status": "paid",
+    "template": "minimal",
+    "createdAt": "2026-02-20T15:00:00Z",
+    "dueDate": "2026-03-07T15:00:00Z",
+    "isPaid": true,
+    "notes": ""
+  },
+  {
+    "id": "inv-8",
+    "invoiceNumber": "FIN-2026-0008",
+    "businessId": "demo-finora-tech",
+    "clientId": "client-horizon",
+    "items": [
+      { "id": "item-11", "description": "Senior Fullstack Engineer (Hourly)", "quantity": 60, "price": 150.00, "taxRate": 18, "discount": 5 }
+    ],
+    "subtotal": 9000.00,
+    "taxTotal": 1539.00,
+    "discountTotal": 450.00,
+    "total": 10089.00,
+    "status": "paid",
+    "template": "corporate",
+    "createdAt": "2026-03-01T10:00:00Z",
+    "dueDate": "2026-03-31T10:00:00Z",
+    "isPaid": true,
+    "notes": "Academic rate applied."
+  },
+  {
+    "id": "inv-9",
+    "invoiceNumber": "FIN-2026-0009",
+    "businessId": "demo-finora-tech",
+    "clientId": "client-zenith",
+    "items": [
+      { "id": "item-12", "description": "Internal Elasticsearch Indexer", "quantity": 1, "price": 3500.00, "taxRate": 18, "discount": 0 }
+    ],
+    "subtotal": 3500.00,
+    "taxTotal": 630.00,
+    "discountTotal": 0.00,
+    "total": 4130.00,
+    "status": "paid",
+    "template": "modern",
+    "createdAt": "2026-03-05T13:00:00Z",
+    "dueDate": "2026-04-04T13:00:00Z",
+    "isPaid": true,
+    "notes": "E-Commerce catalog indexing cluster installation."
+  },
+  {
+    "id": "inv-10",
+    "invoiceNumber": "FIN-2026-0010",
+    "businessId": "demo-finora-tech",
+    "clientId": "client-alpha",
+    "items": [
+      { "id": "item-13", "description": "Monthly SEO Growth Engine Retainer", "quantity": 1, "price": 1200.00, "taxRate": 18, "discount": 0 }
+    ],
+    "subtotal": 1200.00,
+    "taxTotal": 216.00,
+    "discountTotal": 0.00,
+    "total": 1416.00,
+    "status": "paid",
+    "template": "creative",
+    "createdAt": "2026-03-10T12:00:00Z",
+    "dueDate": "2026-03-25T12:00:00Z",
+    "isPaid": true,
+    "notes": "SEO Support for March."
+  },
+  {
+    "id": "inv-11",
+    "invoiceNumber": "FIN-2026-0011",
+    "businessId": "demo-finora-tech",
+    "clientId": "client-acme",
+    "items": [
+      { "id": "item-14", "description": "Senior Fullstack Engineer (Hourly)", "quantity": 120, "price": 150.00, "taxRate": 18, "discount": 0 }
+    ],
+    "subtotal": 18000.00,
+    "taxTotal": 3240.00,
+    "discountTotal": 0.00,
+    "total": 21240.00,
+    "status": "paid",
+    "template": "corporate",
+    "createdAt": "2026-03-15T09:00:00Z",
+    "dueDate": "2026-04-15T09:00:00Z",
+    "isPaid": true,
+    "notes": "Enterprise core portal customization."
+  },
+  {
+    "id": "inv-12",
+    "invoiceNumber": "FIN-2026-0012",
+    "businessId": "demo-finora-tech",
+    "clientId": "client-stellar",
+    "items": [
+      { "id": "item-15", "description": "Enterprise Mobile SDK", "quantity": 1, "price": 2500.00, "taxRate": 18, "discount": 10 }
+    ],
+    "subtotal": 2500.00,
+    "taxTotal": 405.00,
+    "discountTotal": 250.00,
+    "total": 2655.00,
+    "status": "paid",
+    "template": "modern",
+    "createdAt": "2026-03-20T10:00:00Z",
+    "dueDate": "2026-04-04T10:00:00Z",
+    "isPaid": true,
+    "notes": "Loyalty partner discount applied."
+  },
+  {
+    "id": "inv-13",
+    "invoiceNumber": "FIN-2026-0013",
+    "businessId": "demo-finora-tech",
+    "clientId": "client-orbit",
+    "items": [
+      { "id": "item-16", "description": "Scrum & Agile Team Coaching (Day Rate)", "quantity": 5, "price": 1000.00, "taxRate": 18, "discount": 0 }
+    ],
+    "subtotal": 5000.00,
+    "taxTotal": 900.00,
+    "discountTotal": 0.00,
+    "total": 5900.00,
+    "status": "paid",
+    "template": "minimal",
+    "createdAt": "2026-03-25T11:00:00Z",
+    "dueDate": "2026-04-24T11:00:00Z",
+    "isPaid": true,
+    "notes": "Agile launch coaching sprint."
+  },
+  {
+    "id": "inv-14",
+    "invoiceNumber": "FIN-2026-0014",
+    "businessId": "demo-finora-tech",
+    "clientId": "client-pixel",
+    "items": [
+      { "id": "item-17", "description": "Dedicated Senior Developer Hours", "quantity": 16, "price": 150.00, "taxRate": 18, "discount": 0 }
+    ],
+    "subtotal": 2400.00,
+    "taxTotal": 432.00,
+    "discountTotal": 0.00,
+    "total": 2832.00,
+    "status": "paid",
+    "template": "creative",
+    "createdAt": "2026-04-01T14:30:00Z",
+    "dueDate": "2026-04-16T14:30:00Z",
+    "isPaid": true,
+    "notes": "Figma web prototype custom plugin build."
+  },
+  {
+    "id": "inv-15",
+    "invoiceNumber": "FIN-2026-0015",
+    "businessId": "demo-finora-tech",
+    "clientId": "client-apex",
+    "items": [
+      { "id": "item-18", "description": "Automated Cypress/Playwright QA Retainer", "quantity": 1, "price": 2000.00, "taxRate": 18, "discount": 0 }
+    ],
+    "subtotal": 2000.00,
+    "taxTotal": 360.00,
+    "discountTotal": 0.00,
+    "total": 2360.00,
+    "status": "paid",
+    "template": "corporate",
+    "createdAt": "2026-04-05T10:00:00Z",
+    "dueDate": "2026-05-05T10:00:00Z",
+    "isPaid": true,
+    "notes": "April QA retainer."
+  },
+  {
+    "id": "inv-16",
+    "invoiceNumber": "FIN-2026-0016",
+    "businessId": "demo-finora-tech",
+    "clientId": "client-quantum",
+    "items": [
+      { "id": "item-19", "description": "Senior Fullstack Engineer (Hourly)", "quantity": 100, "price": 150.00, "taxRate": 18, "discount": 0 }
+    ],
+    "subtotal": 15000.00,
+    "taxTotal": 2700.00,
+    "discountTotal": 0.00,
+    "total": 17700.00,
+    "status": "paid",
+    "template": "corporate",
+    "createdAt": "2026-04-10T12:00:00Z",
+    "dueDate": "2026-06-09T12:00:00Z",
+    "isPaid": true,
+    "notes": "Phase 2 dashboard implementation block."
+  },
+  {
+    "id": "inv-17",
+    "invoiceNumber": "FIN-2026-0017",
+    "businessId": "demo-finora-tech",
+    "clientId": "client-nexus",
+    "items": [
+      { "id": "item-20", "description": "SMS Routing Gateway Broker", "quantity": 1, "price": 1800.00, "taxRate": 18, "discount": 0 }
+    ],
+    "subtotal": 1800.00,
+    "taxTotal": 324.00,
+    "discountTotal": 0.00,
+    "total": 2124.00,
+    "status": "paid",
+    "template": "minimal",
+    "createdAt": "2026-04-15T15:30:00Z",
+    "dueDate": "2026-04-30T15:30:00Z",
+    "isPaid": true,
+    "notes": "Freight status broadcast cluster installation."
+  },
+  {
+    "id": "inv-18",
+    "invoiceNumber": "FIN-2026-0018",
+    "businessId": "demo-finora-tech",
+    "clientId": "client-horizon",
+    "items": [
+      { "id": "item-21", "description": "Monthly App SLA Maintenance Plan", "quantity": 1, "price": 1500.00, "taxRate": 18, "discount": 5 }
+    ],
+    "subtotal": 1500.00,
+    "taxTotal": 256.50,
+    "discountTotal": 75.00,
+    "total": 1681.50,
+    "status": "paid",
+    "template": "corporate",
+    "createdAt": "2026-04-20T10:00:00Z",
+    "dueDate": "2026-05-20T10:00:00Z",
+    "isPaid": true,
+    "notes": "SLA Maintenance Retainer for April."
+  },
+  {
+    "id": "inv-19",
+    "invoiceNumber": "FIN-2026-0019",
+    "businessId": "demo-finora-tech",
+    "clientId": "client-zenith",
+    "items": [
+      { "id": "item-22", "description": "Senior Fullstack Engineer (Hourly)", "quantity": 30, "price": 150.00, "taxRate": 18, "discount": 0 }
+    ],
+    "subtotal": 4500.00,
+    "taxTotal": 810.00,
+    "discountTotal": 0.00,
+    "total": 5310.00,
+    "status": "paid",
+    "template": "modern",
+    "createdAt": "2026-04-25T11:00:00Z",
+    "dueDate": "2026-05-25T11:00:00Z",
+    "isPaid": true,
+    "notes": "E-commerce checkout cart pipeline optimization."
+  },
+  {
+    "id": "inv-20",
+    "invoiceNumber": "FIN-2026-0020",
+    "businessId": "demo-finora-tech",
+    "clientId": "client-alpha",
+    "items": [
+      { "id": "item-23", "description": "Monthly SEO Growth Engine Retainer", "quantity": 1, "price": 1200.00, "taxRate": 18, "discount": 0 }
+    ],
+    "subtotal": 1200.00,
+    "taxTotal": 216.00,
+    "discountTotal": 0.00,
+    "total": 1416.00,
+    "status": "paid",
+    "template": "creative",
+    "createdAt": "2026-04-30T12:00:00Z",
+    "dueDate": "2026-05-15T12:00:00Z",
+    "isPaid": true,
+    "notes": "SEO Support for April."
+  },
+  {
+    "id": "inv-21",
+    "invoiceNumber": "FIN-2026-0021",
+    "businessId": "demo-finora-tech",
+    "clientId": "client-acme",
+    "items": [
+      { "id": "item-24", "description": "AI LLM Integration & Prompt Design", "quantity": 1, "price": 7500.00, "taxRate": 18, "discount": 0 }
+    ],
+    "subtotal": 7500.00,
+    "taxTotal": 1350.00,
+    "discountTotal": 0.00,
+    "total": 8850.00,
+    "status": "paid",
+    "template": "corporate",
+    "createdAt": "2026-05-01T10:00:00Z",
+    "dueDate": "2026-05-31T10:00:00Z",
+    "isPaid": true,
+    "notes": "Contract indexing LLM fine-tune integration."
+  },
+  {
+    "id": "inv-22",
+    "invoiceNumber": "FIN-2026-0022",
+    "businessId": "demo-finora-tech",
+    "clientId": "client-stellar",
+    "items": [
+      { "id": "item-25", "description": "Interactive UI/UX Design Sprint", "quantity": 1, "price": 3200.00, "taxRate": 18, "discount": 5 }
+    ],
+    "subtotal": 3200.00,
+    "taxTotal": 547.20,
+    "discountTotal": 160.00,
+    "total": 3587.20,
+    "status": "paid",
+    "template": "modern",
+    "createdAt": "2026-05-05T13:00:00Z",
+    "dueDate": "2026-05-20T13:00:00Z",
+    "isPaid": true,
+    "notes": "Product detail page layouts restructuring redesign."
+  },
+  {
+    "id": "inv-23",
+    "invoiceNumber": "FIN-2026-0023",
+    "businessId": "demo-finora-tech",
+    "clientId": "client-orbit",
+    "items": [
+      { "id": "item-26", "description": "Senior Fullstack Engineer (Hourly)", "quantity": 50, "price": 150.00, "taxRate": 18, "discount": 0 }
+    ],
+    "subtotal": 7500.00,
+    "taxTotal": 1350.00,
+    "discountTotal": 0.00,
+    "total": 8850.00,
+    "status": "paid",
+    "template": "minimal",
+    "createdAt": "2026-05-10T11:00:00Z",
+    "dueDate": "2026-06-09T11:00:00Z",
+    "isPaid": true,
+    "notes": "May consulting."
+  },
+  {
+    "id": "inv-24",
+    "invoiceNumber": "FIN-2026-0024",
+    "businessId": "demo-finora-tech",
+    "clientId": "client-pixel",
+    "items": [
+      { "id": "item-27", "description": "Real-time Node Monitoring Agent", "quantity": 4, "price": 300.00, "taxRate": 18, "discount": 0 }
+    ],
+    "subtotal": 1200.00,
+    "taxTotal": 216.00,
+    "discountTotal": 0.00,
+    "total": 1416.00,
+    "status": "paid",
+    "template": "creative",
+    "createdAt": "2026-05-15T15:00:00Z",
+    "dueDate": "2026-05-30T15:00:00Z",
+    "isPaid": true,
+    "notes": ""
+  },
+  {
+    "id": "inv-25",
+    "invoiceNumber": "FIN-2026-0025",
+    "businessId": "demo-finora-tech",
+    "clientId": "client-apex",
+    "items": [
+      { "id": "item-28", "description": "Automated Cypress/Playwright QA Retainer", "quantity": 1, "price": 2000.00, "taxRate": 18, "discount": 0 }
+    ],
+    "subtotal": 2000.00,
+    "taxTotal": 360.00,
+    "discountTotal": 0.00,
+    "total": 2360.00,
+    "status": "paid",
+    "template": "corporate",
+    "createdAt": "2026-05-20T09:30:00Z",
+    "dueDate": "2026-06-19T09:30:00Z",
+    "isPaid": true,
+    "notes": "May QA retainer."
+  },
+  {
+    "id": "inv-26",
+    "invoiceNumber": "FIN-2026-0026",
+    "businessId": "demo-finora-tech",
+    "clientId": "client-quantum",
+    "items": [
+      { "id": "item-29", "description": "Cybersecurity & Vulnerability Audit", "quantity": 1, "price": 5000.00, "taxRate": 18, "discount": 0 }
+    ],
+    "subtotal": 5000.00,
+    "taxTotal": 900.00,
+    "discountTotal": 0.00,
+    "total": 5900.00,
+    "status": "paid",
+    "template": "corporate",
+    "createdAt": "2026-05-25T11:30:00Z",
+    "dueDate": "2026-06-24T11:30:00Z",
+    "isPaid": true,
+    "notes": "On-prem database system security testing."
+  },
+  {
+    "id": "inv-27",
+    "invoiceNumber": "FIN-2026-0027",
+    "businessId": "demo-finora-tech",
+    "clientId": "client-nexus",
+    "items": [
+      { "id": "item-30", "description": "Senior Fullstack Engineer (Hourly)", "quantity": 40, "price": 150.00, "taxRate": 18, "discount": 0 }
+    ],
+    "subtotal": 6000.00,
+    "taxTotal": 1080.00,
+    "discountTotal": 0.00,
+    "total": 7080.00,
+    "status": "paid",
+    "template": "minimal",
+    "createdAt": "2026-06-01T10:00:00Z",
+    "dueDate": "2026-06-16T10:00:00Z",
+    "isPaid": true,
+    "notes": "Route dispatcher algorithm dev blocks."
+  },
+  {
+    "id": "inv-28",
+    "invoiceNumber": "FIN-2026-0028",
+    "businessId": "demo-finora-tech",
+    "clientId": "client-horizon",
+    "items": [
+      { "id": "item-31", "description": "Monthly App SLA Maintenance Plan", "quantity": 1, "price": 1500.00, "taxRate": 18, "discount": 5 }
+    ],
+    "subtotal": 1500.00,
+    "taxTotal": 256.50,
+    "discountTotal": 75.00,
+    "total": 1681.50,
+    "status": "paid",
+    "template": "corporate",
+    "createdAt": "2026-05-20T10:00:00Z",
+    "dueDate": "2026-06-19T10:00:00Z",
+    "isPaid": true,
+    "notes": "SLA Maintenance plan billing."
+  },
+  {
+    "id": "inv-29",
+    "invoiceNumber": "FIN-2026-0029",
+    "businessId": "demo-finora-tech",
+    "clientId": "client-zenith",
+    "items": [
+      { "id": "item-32", "description": "Database Query Optimization Sprint", "quantity": 1, "price": 1800.00, "taxRate": 18, "discount": 0 }
+    ],
+    "subtotal": 1800.00,
+    "taxTotal": 324.00,
+    "discountTotal": 0.00,
+    "total": 2124.00,
+    "status": "paid",
+    "template": "modern",
+    "createdAt": "2026-06-05T14:00:00Z",
+    "dueDate": "2026-06-20T14:00:00Z",
+    "isPaid": true,
+    "notes": ""
+  },
+  {
+    "id": "inv-30",
+    "invoiceNumber": "FIN-2026-0030",
+    "businessId": "demo-finora-tech",
+    "clientId": "client-alpha",
+    "items": [
+      { "id": "item-33", "description": "Monthly SEO Growth Engine Retainer", "quantity": 1, "price": 1200.00, "taxRate": 18, "discount": 0 }
+    ],
+    "subtotal": 1200.00,
+    "taxTotal": 216.00,
+    "discountTotal": 0.00,
+    "total": 1416.00,
+    "status": "paid",
+    "template": "creative",
+    "createdAt": "2026-05-30T12:00:00Z",
+    "dueDate": "2026-06-14T12:00:00Z",
+    "isPaid": true,
+    "notes": "SEO Support for May."
+  },
+  {
+    "id": "inv-31",
+    "invoiceNumber": "FIN-2026-0031",
+    "businessId": "demo-finora-tech",
+    "clientId": "client-acme",
+    "items": [
+      { "id": "item-34", "description": "Senior Fullstack Engineer (Hourly)", "quantity": 160, "price": 150.00, "taxRate": 18, "discount": 0 }
+    ],
+    "subtotal": 24000.00,
+    "taxTotal": 4320.00,
+    "discountTotal": 0.00,
+    "total": 28320.00,
+    "status": "sent",
+    "template": "corporate",
+    "createdAt": "2026-06-15T09:00:00Z",
+    "dueDate": "2026-07-15T09:00:00Z",
+    "isPaid": false,
+    "notes": "June Enterprise customization billing. Currently processing."
+  },
+  {
+    "id": "inv-32",
+    "invoiceNumber": "FIN-2026-0032",
+    "businessId": "demo-finora-tech",
+    "clientId": "client-stellar",
+    "items": [
+      { "id": "item-35", "description": "Senior Fullstack Engineer (Hourly)", "quantity": 25, "price": 150.00, "taxRate": 18, "discount": 5 }
+    ],
+    "subtotal": 3750.00,
+    "taxTotal": 641.25,
+    "discountTotal": 187.50,
+    "total": 4203.75,
+    "status": "sent",
+    "template": "modern",
+    "createdAt": "2026-06-18T11:00:00Z",
+    "dueDate": "2026-07-03T11:00:00Z",
+    "isPaid": false,
+    "notes": "Payment pending."
+  },
+  {
+    "id": "inv-33",
+    "invoiceNumber": "FIN-2026-0033",
+    "businessId": "demo-finora-tech",
+    "clientId": "client-orbit",
+    "items": [
+      { "id": "item-36", "description": "Senior Fullstack Engineer (Hourly)", "quantity": 45, "price": 150.00, "taxRate": 18, "discount": 0 }
+    ],
+    "subtotal": 6750.00,
+    "taxTotal": 1215.00,
+    "discountTotal": 0.00,
+    "total": 7965.00,
+    "status": "sent",
+    "template": "minimal",
+    "createdAt": "2026-06-20T14:30:00Z",
+    "dueDate": "2026-07-20T14:30:00Z",
+    "isPaid": false,
+    "notes": "June development hours."
+  },
+  {
+    "id": "inv-34",
+    "invoiceNumber": "FIN-2026-0034",
+    "businessId": "demo-finora-tech",
+    "clientId": "client-pixel",
+    "items": [
+      { "id": "item-37", "description": "Interactive UI/UX Design Sprint", "quantity": 1, "price": 3200.00, "taxRate": 18, "discount": 0 }
+    ],
+    "subtotal": 3200.00,
+    "taxTotal": 576.00,
+    "discountTotal": 0.00,
+    "total": 3776.00,
+    "status": "draft",
+    "template": "creative",
+    "createdAt": "2026-06-22T10:00:00Z",
+    "dueDate": "2026-07-07T10:00:00Z",
+    "isPaid": false,
+    "notes": "Design sprint 2 draft estimate."
+  },
+  {
+    "id": "inv-35",
+    "invoiceNumber": "FIN-2026-0035",
+    "businessId": "demo-finora-tech",
+    "clientId": "client-apex",
+    "items": [
+      { "id": "item-38", "description": "Automated Cypress/Playwright QA Retainer", "quantity": 1, "price": 2000.00, "taxRate": 18, "discount": 0 }
+    ],
+    "subtotal": 2000.00,
+    "taxTotal": 360.00,
+    "discountTotal": 0.00,
+    "total": 2360.00,
+    "status": "sent",
+    "template": "corporate",
+    "createdAt": "2026-06-20T09:00:00Z",
+    "dueDate": "2026-07-20T09:00:00Z",
+    "isPaid": false,
+    "notes": "June QA retainer."
+  },
+  {
+    "id": "inv-36",
+    "invoiceNumber": "FIN-2026-0036",
+    "businessId": "demo-finora-tech",
+    "clientId": "client-quantum",
+    "items": [
+      { "id": "item-39", "description": "Senior Fullstack Engineer (Hourly)", "quantity": 50, "price": 150.00, "taxRate": 18, "discount": 0 }
+    ],
+    "subtotal": 7500.00,
+    "taxTotal": 1350.00,
+    "discountTotal": 0.00,
+    "total": 8850.00,
+    "status": "overdue",
+    "template": "corporate",
+    "createdAt": "2026-05-10T11:00:00Z",
+    "dueDate": "2026-06-09T11:00:00Z",
+    "isPaid": false,
+    "notes": "OVERDUE NOTICE: Please remit payment immediately."
+  },
+  {
+    "id": "inv-37",
+    "invoiceNumber": "FIN-2026-0037",
+    "businessId": "demo-finora-tech",
+    "clientId": "client-nexus",
+    "items": [
+      { "id": "item-40", "description": "Secure Data Exporter & Backup", "quantity": 1, "price": 600.00, "taxRate": 18, "discount": 0 }
+    ],
+    "subtotal": 600.00,
+    "taxTotal": 108.00,
+    "discountTotal": 0.00,
+    "total": 708.00,
+    "status": "overdue",
+    "template": "minimal",
+    "createdAt": "2026-05-15T10:00:00Z",
+    "dueDate": "2026-05-30T10:00:00Z",
+    "isPaid": false,
+    "notes": "Payment overdue."
+  },
+  {
+    "id": "inv-38",
+    "invoiceNumber": "FIN-2026-0038",
+    "businessId": "demo-finora-tech",
+    "clientId": "client-horizon",
+    "items": [
+      { "id": "item-41", "description": "Senior Fullstack Engineer (Hourly)", "quantity": 30, "price": 150.00, "taxRate": 18, "discount": 0 }
+    ],
+    "subtotal": 4500.00,
+    "taxTotal": 810.00,
+    "discountTotal": 0.00,
+    "total": 5310.00,
+    "status": "draft",
+    "template": "corporate",
+    "createdAt": "2026-06-25T11:00:00Z",
+    "dueDate": "2026-07-25T11:00:00Z",
+    "isPaid": false,
+    "notes": "Draft proposal for new course portal feature."
+  },
+  {
+    "id": "inv-39",
+    "invoiceNumber": "FIN-2026-0039",
+    "businessId": "demo-finora-tech",
+    "clientId": "client-zenith",
+    "items": [
+      { "id": "item-42", "description": "Secure Data Exporter & Backup", "quantity": 1, "price": 600.00, "taxRate": 18, "discount": 10 }
+    ],
+    "subtotal": 600.00,
+    "taxTotal": 97.20,
+    "discountTotal": 60.00,
+    "total": 637.20,
+    "status": "sent",
+    "template": "modern",
+    "createdAt": "2026-06-20T15:00:00Z",
+    "dueDate": "2026-07-05T15:00:00Z",
+    "isPaid": false,
+    "notes": "Partial Payment of $200 has been recorded. Outstanding balance: $437.20"
+  },
+  {
+    "id": "inv-40",
+    "invoiceNumber": "FIN-2026-0040",
+    "businessId": "demo-finora-tech",
+    "clientId": "client-alpha",
+    "items": [
+      { "id": "item-43", "description": "Monthly SEO Growth Engine Retainer", "quantity": 1, "price": 1200.00, "taxRate": 18, "discount": 0 }
+    ],
+    "subtotal": 1200.00,
+    "taxTotal": 216.00,
+    "discountTotal": 0.00,
+    "total": 1416.00,
+    "status": "sent",
+    "template": "creative",
+    "createdAt": "2026-06-15T12:00:00Z",
+    "dueDate": "2026-06-30T12:00:00Z",
+    "isPaid": false,
+    "notes": "SEO Support for June."
+  }
+]

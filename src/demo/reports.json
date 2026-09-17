@@ -1,0 +1,11 @@
+{
+  "taxSummary": {
+    "totalGstCollected": 27278.12,
+    "totalGstPaid": 3313.35,
+    "netGstPayable": 23964.77
+  },
+  "quarterlyReports": [
+    { "quarter": "Q1 2026", "sales": 82055.76, "cgst": 7385.02, "sgst": 7385.02, "igst": 0.00, "totalTax": 14770.04 },
+    { "quarter": "Q2 2026", "sales": 71323.02, "cgst": 6254.04, "sgst": 6254.04, "igst": 0.00, "totalTax": 12508.08 }
+  ]
+}

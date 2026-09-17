@@ -1,0 +1,62 @@
+<svg viewBox="0 0 240 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Primary Gradient (Representing capital flows & secure tech) -->
+    <linearGradient id="fav-grad-primary" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stopColor="#2563eb" />
+      <stop offset="100%" stopColor="#7c3aed" />
+    </linearGradient>
+    
+    <!-- Accent Gradient (Representing velocity and modern analytics) -->
+    <linearGradient id="fav-grad-accent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stopColor="#06b6d4" />
+      <stop offset="100%" stopColor="#3b82f6" />
+    </linearGradient>
+
+    <!-- Subtle reflection drop shadow to add physical presence -->
+    <filter id="fav-shadow" x="-10%" y="-10%" width="120%" height="120%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" floodColor="#0f172a" floodOpacity="0.12" />
+    </filter>
+  </defs>
+
+  <g filter="url(#fav-shadow)">
+    <!-- Left Stable Pillar (Vertical Stem of 'F' - foundation of enterprise balance) -->
+    <rect
+      x="45"
+      y="40"
+      width="32"
+      height="160"
+      rx="10"
+      fill="url(#fav-grad-primary)"
+    />
+
+    <!-- Top Horizontal Pillar (Long upper arm of 'F' - forward leaning growth) -->
+    <rect
+      x="89"
+      y="40"
+      width="106"
+      height="32"
+      rx="10"
+      fill="url(#fav-grad-primary)"
+    />
+
+    <!-- Mid Horizontal Pillar (Shorter middle arm of 'F' - ledger tracking) -->
+    <rect
+      x="89"
+      y="104"
+      width="68"
+      height="32"
+      rx="10"
+      fill="url(#fav-grad-accent)"
+    />
+
+    <!-- Success Growth Block (The emerald intelligence point - represents green balances, success, and GST compliance) -->
+    <rect
+      x="169"
+      y="104"
+      width="26"
+      height="32"
+      rx="10"
+      fill="#10b981"
+    />
+  </g>
+</svg>

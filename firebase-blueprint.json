@@ -1,0 +1,414 @@
+{
+  "entities": {
+    "Organization": {
+      "title": "Organization",
+      "description": "Represents a business organization tenant in the SaaS system.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "The name of the organization company." },
+        "email": { "type": "string", "description": "The organization contact email." },
+        "phone": { "type": "string", "description": "The organization contact phone." },
+        "address": { "type": "string", "description": "The physical address of the organization." },
+        "city": { "type": "string", "description": "The city of the organization." },
+        "country": { "type": "string", "description": "The country of the organization." },
+        "taxId": { "type": "string", "description": "Tax Identification / GST Registration number." },
+        "accentColor": { "type": "string", "description": "Visual theme brand accent color." },
+        "font": { "type": "string", "description": "Selected typography font family." },
+        "footerText": { "type": "string", "description": "Default payment footer disclaimer text." },
+        "logoUrl": { "type": "string", "description": "Optional URL to uploaded company logo image." },
+        "signatureUrl": { "type": "string", "description": "Optional URL to uploaded digital signature image." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "The creation timestamp." },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "The last modification timestamp." }
+      },
+      "required": ["name", "createdAt", "updatedAt"]
+    },
+    "OrganizationMember": {
+      "title": "Organization Member",
+      "description": "Represents the membership association of a user to an organization.",
+      "type": "object",
+      "properties": {
+        "orgId": { "type": "string", "description": "Reference to the parent organization ID." },
+        "userId": { "type": "string", "description": "Reference to the Firebase Auth user ID." },
+        "role": { "type": "string", "enum": ["owner", "admin", "member"], "description": "Member authorization access role." },
+        "email": { "type": "string", "description": "Email address of the invited/joined member." },
+        "joinedAt": { "type": "string", "format": "date-time", "description": "Membership join timestamp." }
+      },
+      "required": ["orgId", "userId", "role", "email", "joinedAt"]
+    },
+    "Client": {
+      "title": "Client",
+      "description": "Represents a customer of the organization.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Name of the client." },
+        "email": { "type": "string", "description": "Client billing email." },
+        "phone": { "type": "string", "description": "Client contact phone." },
+        "address": { "type": "string", "description": "Client billing physical address." },
+        "city": { "type": "string", "description": "Client billing city." },
+        "country": { "type": "string", "description": "Client billing country." },
+        "taxId": { "type": "string", "description": "Client tax / GST registration number." },
+        "notes": { "type": "string", "description": "Internal notes regarding client." },
+        "currency": { "type": "string", "description": "Selected client billing currency code." },
+        "currencySymbol": { "type": "string", "description": "Selected client billing currency visual symbol." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Creation timestamp." }
+      },
+      "required": ["name", "createdAt"]
+    },
+    "Invoice": {
+      "title": "Invoice",
+      "description": "Represents an invoice document billed from organization to a client.",
+      "type": "object",
+      "properties": {
+        "clientId": { "type": "string", "description": "Reference to target Client ID." },
+        "invoiceNumber": { "type": "string", "description": "Unique serial invoice number code." },
+        "template": { "type": "string", "description": "Name of the visual PDF template style to use." },
+        "subtotal": { "type": "number", "description": "Sum of all line items pre-tax and discount." },
+        "taxTotal": { "type": "number", "description": "Calculated total tax amount applied." },
+        "discountTotal": { "type": "number", "description": "Calculated total discount amount deducted." },
+        "total": { "type": "number", "description": "Final invoice total receivable amount." },
+        "status": { "type": "string", "enum": ["draft", "sent", "paid", "overdue", "cancelled"], "description": "Current status of the invoice." },
+        "statusHistory": { "type": "array", "description": "JSON trace of status transitions." },
+        "notes": { "type": "string", "description": "Invoice-specific footer footnotes/payment instructions." },
+        "dueDate": { "type": "string", "format": "date-time", "description": "The date when payment is due." },
+        "isPaid": { "type": "boolean", "description": "Convenience flag indicating paid state." },
+        "paymentQr": { "type": "string", "description": "Optional QR code contents for local payment gateways." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Creation timestamp." },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Modification timestamp." }
+      },
+      "required": ["clientId", "invoiceNumber", "subtotal", "total", "status", "dueDate", "isPaid", "createdAt", "updatedAt"]
+    },
+    "InvoiceItem": {
+      "title": "Invoice Item",
+      "description": "Normalized line item inside an invoice document.",
+      "type": "object",
+      "properties": {
+        "description": { "type": "string", "description": "Line item description / name." },
+        "quantity": { "type": "number", "description": "The number of units." },
+        "rate": { "type": "number", "description": "Price per unit." },
+        "amount": { "type": "number", "description": "Calculated total item price pre-tax (quantity * rate)." },
+        "taxRate": { "type": "number", "description": "Specific tax rate applied to this item." },
+        "taxAmount": { "type": "number", "description": "Calculated tax amount for this item." },
+        "order": { "type": "number", "description": "Sort order placement of item inside invoice layout." }
+      },
+      "required": ["description", "quantity", "rate", "amount", "order"]
+    },
+    "RecurringSchedule": {
+      "title": "Recurring Schedule",
+      "description": "Represents an automated recurring generation schedule for invoices.",
+      "type": "object",
+      "properties": {
+        "clientId": { "type": "string", "description": "Reference to target Client ID." },
+        "frequency": { "type": "string", "enum": ["weekly", "biweekly", "monthly", "yearly"], "description": "Recurrence cycle frequency." },
+        "startDate": { "type": "string", "format": "date-time", "description": "Cycle commencement date." },
+        "endDate": { "type": "string", "format": "date-time", "description": "Optional cycle expiration date." },
+        "nextGenerationDate": { "type": "string", "format": "date-time", "description": "Calculated next execution run date." },
+        "isActive": { "type": "boolean", "description": "Active state flag to pause/resume recurring billing." },
+        "autoSend": { "type": "boolean", "description": "Auto-email the invoice PDF directly upon automated generation." },
+        "invoiceTemplate": { "type": "object", "description": "Snapshot payload for template defaults when spawning invoices." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Creation timestamp." }
+      },
+      "required": ["clientId", "frequency", "startDate", "nextGenerationDate", "isActive", "autoSend", "invoiceTemplate", "createdAt"]
+    },
+    "AppSettings": {
+      "title": "App Settings",
+      "description": "Global layout, system configuration and auto-email rules for organization.",
+      "type": "object",
+      "properties": {
+        "theme": { "type": "string", "description": "Selected dark/light active app aesthetic." },
+        "currency": { "type": "string", "description": "Default organization currency code." },
+        "currencySymbol": { "type": "string", "description": "Default organization currency symbol." },
+        "invoicePrefix": { "type": "string", "description": "Default invoice prefix code (e.g. INV-)." },
+        "invoiceSuffix": { "type": "string", "description": "Default invoice suffix code." },
+        "defaultTaxRate": { "type": "number", "description": "Default business tax percentage rate." },
+        "defaultPaymentTerms": { "type": "string", "description": "Default business payment window terms (e.g., net30)." },
+        "emailSettings": { "type": "object", "description": "Configuration dictionary for auto send and headers/footers." },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Last modification timestamp." }
+      },
+      "required": ["theme", "currency", "currencySymbol", "invoicePrefix", "defaultTaxRate", "defaultPaymentTerms", "emailSettings", "updatedAt"]
+    },
+    "InvoiceAttachment": {
+      "title": "Invoice Attachment",
+      "description": "Represents an uploaded file associated with an invoice.",
+      "type": "object",
+      "properties": {
+        "invoiceId": { "type": "string", "description": "Reference to target Invoice ID." },
+        "fileName": { "type": "string", "description": "Human-readable uploaded file name." },
+        "fileUrl": { "type": "string", "description": "Storage download URL of file." },
+        "fileSize": { "type": "number", "description": "Size of file in bytes." },
+        "fileType": { "type": "string", "description": "MIME type description of file." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Creation timestamp." }
+      },
+      "required": ["invoiceId", "fileName", "fileUrl", "fileSize", "createdAt"]
+    },
+    "SharedInvoiceLink": {
+      "title": "Shared Invoice Link",
+      "description": "Immutable client-facing snapshot link to display an invoice on the portal.",
+      "type": "object",
+      "properties": {
+        "token": { "type": "string", "description": "Public unique portal access token code." },
+        "orgId": { "type": "string", "description": "Organization owner ID." },
+        "userId": { "type": "string", "description": "Sponsoring generator user ID." },
+        "invoiceId": { "type": "string", "description": "Reference invoice document ID." },
+        "invoiceSnapshot": { "type": "object", "description": "Complete frozen snapshot metadata of invoice." },
+        "businessSnapshot": { "type": "object", "description": "Complete frozen snapshot metadata of billing company." },
+        "clientSnapshot": { "type": "object", "description": "Complete frozen snapshot metadata of target client." },
+        "settingsSnapshot": { "type": "object", "description": "Complete frozen snapshot metadata of system settings." },
+        "expiresAt": { "type": "string", "format": "date-time", "description": "Absolute timestamp when share link expires." },
+        "revoked": { "type": "boolean", "description": "Revocation flag to block access instantly." },
+        "paid": { "type": "boolean", "description": "Flag showing payment status marked from customer portal." },
+        "paidAt": { "type": "string", "format": "date-time", "description": "Payment submission timestamp." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Creation timestamp." }
+      },
+      "required": ["token", "orgId", "userId", "invoiceId", "invoiceSnapshot", "businessSnapshot", "clientSnapshot", "expiresAt", "revoked", "paid", "createdAt"]
+    },
+    "Payment": {
+      "title": "Payment",
+      "description": "Represents a payment transaction against an invoice.",
+      "type": "object",
+      "properties": {
+        "invoiceId": { "type": "string" },
+        "clientId": { "type": "string" },
+        "amount": { "type": "number" },
+        "currency": { "type": "string" },
+        "status": { "type": "string" },
+        "method": { "type": "string" },
+        "referenceNumber": { "type": "string" },
+        "transactionId": { "type": "string" },
+        "paymentDate": { "type": "string", "format": "date-time" },
+        "notes": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["invoiceId", "clientId", "amount", "status", "method", "createdAt"]
+    },
+    "SaasSubscription": {
+      "title": "Saas Subscription",
+      "description": "Represents the active commercial subscription tier and status for an organization tenant.",
+      "type": "object",
+      "properties": {
+        "plan": { "type": "string" },
+        "status": { "type": "string" },
+        "billingCycle": { "type": "string" },
+        "startDate": { "type": "string", "format": "date-time" },
+        "renewalDate": { "type": "string", "format": "date-time" },
+        "trialEndDate": { "type": "string", "format": "date-time" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["plan", "status", "billingCycle", "startDate", "renewalDate", "createdAt"]
+    },
+    "InAppNotification": {
+      "title": "In App Notification",
+      "description": "Represents a transactional system alert notification for the tenant organization.",
+      "type": "object",
+      "properties": {
+        "type": { "type": "string" },
+        "title": { "type": "string" },
+        "message": { "type": "string" },
+        "isRead": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["type", "title", "message", "isRead", "createdAt"]
+    },
+    "Expense": {
+      "title": "Expense",
+      "description": "Represents a business expense.",
+      "type": "object",
+      "properties": {
+        "vendor": { "type": "string" },
+        "category": { "type": "string" },
+        "amount": { "type": "number" },
+        "gst": { "type": "number" },
+        "date": { "type": "string" },
+        "paymentMethod": { "type": "string" },
+        "notes": { "type": "string" },
+        "isRecurring": { "type": "boolean" },
+        "recurringInterval": { "type": "string" },
+        "tags": { "type": "array" },
+        "attachmentUrl": { "type": "string" },
+        "isArchived": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["vendor", "category", "amount", "date", "paymentMethod", "createdAt"]
+    },
+    "ExpenseRule": {
+      "title": "Expense Rule",
+      "description": "Rule-based expense categorization mapping.",
+      "type": "object",
+      "properties": {
+        "keyword": { "type": "string" },
+        "category": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["keyword", "category", "createdAt"]
+    },
+    "ReminderHistory": {
+      "title": "Reminder History",
+      "description": "Tracks payment reminders sent to clients.",
+      "type": "object",
+      "properties": {
+        "invoiceId": { "type": "string" },
+        "clientId": { "type": "string" },
+        "type": { "type": "string" },
+        "channel": { "type": "string" },
+        "content": { "type": "string" },
+        "sentAt": { "type": "string", "format": "date-time" },
+        "status": { "type": "string" }
+      },
+      "required": ["invoiceId", "clientId", "type", "channel", "content", "sentAt", "status"]
+    },
+    "DescriptionTemplate": {
+      "title": "Description Template",
+      "description": "Template for smart description builder.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "category": { "type": "string" },
+        "templateText": { "type": "string" },
+        "isCustom": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "category", "templateText", "createdAt"]
+    },
+    "DocumentItem": {
+      "title": "Document Item",
+      "description": "Represents an uploaded file inside the Document Center.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "type": { "type": "string" },
+        "fileUrl": { "type": "string" },
+        "fileSize": { "type": "number" },
+        "folderId": { "type": "string" },
+        "isDeleted": { "type": "boolean" },
+        "deletedAt": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "type", "fileUrl", "fileSize", "createdAt"]
+    },
+    "DocumentFolder": {
+      "title": "Document Folder",
+      "description": "Folder hierarchy inside the Document Center.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "createdAt"]
+    },
+    "ActivityLog": {
+      "title": "Activity Log",
+      "description": "Maintains a full timeline audit of business activities.",
+      "type": "object",
+      "properties": {
+        "type": { "type": "string" },
+        "label": { "type": "string" },
+        "detail": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["type", "label", "detail", "createdAt"]
+    },
+    "CustomInvoiceTemplate": {
+      "title": "Custom Invoice Template",
+      "description": "User-uploaded custom invoice design template with visual field mappings.",
+      "type": "object",
+      "properties": {
+        "templateId": { "type": "string", "description": "Unique identifier for the custom template." },
+        "organizationId": { "type": "string", "description": "Owning organization tenant ID." },
+        "userId": { "type": "string", "description": "UID of the user who uploaded the template." },
+        "templateName": { "type": "string", "description": "Human-readable name of the template." },
+        "assetUrl": { "type": "string", "description": "Firebase Storage or URL of the template background image." },
+        "type": { "type": "string", "description": "Template archetype or file type (e.g. custom, png, jpg, svg, pdf)." },
+        "fieldMappings": { "type": "array", "description": "Visual coordinate field mappings on the template." },
+        "status": { "type": "string", "enum": ["active", "archived"], "description": "Lifecycle status of the template." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Creation timestamp." },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Last update timestamp." }
+      },
+      "required": ["templateId", "organizationId", "templateName", "assetUrl", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/organizations/{orgId}": {
+      "schema": "Organization",
+      "description": "Tenant organization profile."
+    },
+    "/organizations/{orgId}/templates/{templateId}": {
+      "schema": "CustomInvoiceTemplate",
+      "description": "Custom invoice templates uploaded by members of the organization."
+    },
+    "/organization_members/{membershipId}": {
+      "schema": "OrganizationMember",
+      "description": "Membership records for multi-tenant control."
+    },
+    "/organizations/{orgId}/clients/{clientId}": {
+      "schema": "Client",
+      "description": "Clients managed under the organization."
+    },
+    "/organizations/{orgId}/invoices/{invoiceId}": {
+      "schema": "Invoice",
+      "description": "Invoices generated under the organization."
+    },
+    "/organizations/{orgId}/invoices/{invoiceId}/items/{itemId}": {
+      "schema": "InvoiceItem",
+      "description": "Normalized line items inside each invoice document."
+    },
+    "/organizations/{orgId}/invoices/{invoiceId}/attachments/{attachmentId}": {
+      "schema": "InvoiceAttachment",
+      "description": "Attachments uploaded for a specific invoice."
+    },
+    "/organizations/{orgId}/recurring_schedules/{scheduleId}": {
+      "schema": "RecurringSchedule",
+      "description": "Schedules for recurring billing cycles."
+    },
+    "/organizations/{orgId}/payments/{paymentId}": {
+      "schema": "Payment",
+      "description": "Completed visual payment transactions."
+    },
+    "/organizations/{orgId}/subscriptions/{subId}": {
+      "schema": "SaasSubscription",
+      "description": "Tenant-level SaaS plans and limits."
+    },
+    "/organizations/{orgId}/notifications/{notifId}": {
+      "schema": "InAppNotification",
+      "description": "System-level tenant warning/success alerts."
+    },
+    "/organizations/{orgId}/settings/current": {
+      "schema": "AppSettings",
+      "description": "Current active settings for organization."
+    },
+    "/organizations/{orgId}/invoice_attachments/{attachmentId}": {
+      "schema": "InvoiceAttachment",
+      "description": "File attachments related to bills."
+    },
+    "/shared_invoice_links/{linkId}": {
+      "schema": "SharedInvoiceLink",
+      "description": "Root collection for anonymous customer portals via unique secure tokens."
+    },
+    "/organizations/{orgId}/expenses/{expenseId}": {
+      "schema": "Expense",
+      "description": "Company expenses tracking."
+    },
+    "/organizations/{orgId}/expense_rules/{ruleId}": {
+      "schema": "ExpenseRule",
+      "description": "Automated expense categorization rules."
+    },
+    "/organizations/{orgId}/reminders/{reminderId}": {
+      "schema": "ReminderHistory",
+      "description": "Trace of payment reminders sent."
+    },
+    "/organizations/{orgId}/description_templates/{templateId}": {
+      "schema": "DescriptionTemplate",
+      "description": "Templates for description assistant."
+    },
+    "/organizations/{orgId}/documents/{docId}": {
+      "schema": "DocumentItem",
+      "description": "Stored documents and file references."
+    },
+    "/organizations/{orgId}/document_folders/{folderId}": {
+      "schema": "DocumentFolder",
+      "description": "Document folder structure."
+    },
+    "/organizations/{orgId}/activity_logs/{logId}": {
+      "schema": "ActivityLog",
+      "description": "Audit trail log events."
+    }
+  }
+}

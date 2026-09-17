@@ -1,0 +1,8 @@
+[
+  { "month": "Jan", "inflow": 14465.62, "outflow": 5420.00, "net": 9045.62 },
+  { "month": "Feb", "inflow": 24718.64, "outflow": 3200.00, "net": 21518.64 },
+  { "month": "Mar", "inflow": 42771.50, "outflow": 4850.00, "net": 37921.50 },
+  { "month": "Apr", "inflow": 24033.50, "outflow": 4250.00, "net": 19783.50 },
+  { "month": "May", "inflow": 29434.40, "outflow": 6550.00, "net": 22884.40 },
+  { "month": "Jun", "inflow": 17855.12, "outflow": 8100.20, "net": 9754.92 }
+]

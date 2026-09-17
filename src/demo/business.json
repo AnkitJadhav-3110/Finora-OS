@@ -1,0 +1,14 @@
+{
+  "id": "demo-finora-tech",
+  "name": "Finora Technologies",
+  "email": "finance@finora.tech",
+  "phone": "+1 (555) 832-9481",
+  "address": "402 Innovation Way, Suite 100",
+  "city": "San Francisco, CA 94107",
+  "country": "United States",
+  "taxId": "US-8492049-A",
+  "accentColor": "#0f766e",
+  "font": "inter",
+  "footerText": "Thank you for partnering with Finora Technologies! Payment is due within 15 days of invoice date.",
+  "isDemoWorkspace": true
+}

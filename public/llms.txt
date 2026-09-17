@@ -1,0 +1,17 @@
+# InvoicePro
+
+> InvoicePro is a premium invoice generator that lets you create professional invoices with beautiful templates, manage clients, track payments, and grow your business. Upload your own invoice design or use premium templates.
+
+## Pages
+
+- [/](/): Landing page with features, pricing, and FAQ.
+- [/auth](/auth): Sign up and login page.
+- [/dashboard](/dashboard): Dashboard with analytics, recent activity, and quick actions.
+- [/invoices/create](/invoices/create): Create and edit invoices with multiple templates.
+- [/invoices/history](/invoices/history): View, filter, and manage all past invoices.
+- [/clients](/clients): Manage client directory and view client invoice history.
+- [/business](/business): Manage business profiles and branding settings.
+- [/templates](/templates): Upload custom templates and map fields with the drag-and-drop editor.
+- [/tools](/tools): Business utility tools for terms, proposals, and contracts.
+- [/recurring](/recurring): Set up and manage recurring invoices.
+- [/settings](/settings): App settings including currency, theme, and email preferences.

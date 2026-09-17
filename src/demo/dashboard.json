@@ -1,0 +1,17 @@
+{
+  "kpis": {
+    "totalRevenue": 153378.78,
+    "totalExpenses": 32370.20,
+    "netProfit": 121008.58,
+    "outstandingInvoices": 53571.95,
+    "invoiceCount": 40,
+    "activeClients": 10,
+    "averagePaymentDays": 12,
+    "overdueAmount": 9558.00
+  },
+  "recentMilestones": [
+    "Exceeded $150k in total invoice billings.",
+    "Successfully maintained a 100% active client status.",
+    "Outstanding invoice aging is well within the 15-day target."
+  ]
+}

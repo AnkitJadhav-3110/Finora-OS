@@ -1,0 +1,38 @@
+[
+  {
+    "id": "notif-1",
+    "businessId": "demo-finora-tech",
+    "type": "payment_received",
+    "title": "Payment Received",
+    "message": "Acme Global Corporation paid invoice FIN-2026-0001 ($7,668.82) via Bank Transfer.",
+    "isRead": true,
+    "createdAt": "2026-01-16T15:30:00Z"
+  },
+  {
+    "id": "notif-2",
+    "businessId": "demo-finora-tech",
+    "type": "invoice_overdue",
+    "title": "Invoice Overdue",
+    "message": "Invoice FIN-2026-0036 for Quantum Health Analytics is now 30 days overdue ($8,850.00).",
+    "isRead": false,
+    "createdAt": "2026-06-09T09:00:00Z"
+  },
+  {
+    "id": "notif-3",
+    "businessId": "demo-finora-tech",
+    "type": "invoice_sent",
+    "title": "Invoice Sent Successfully",
+    "message": "Invoice FIN-2026-0031 was dispatched to accounts@acmecorp.com.",
+    "isRead": true,
+    "createdAt": "2026-06-15T09:05:00Z"
+  },
+  {
+    "id": "notif-4",
+    "businessId": "demo-finora-tech",
+    "type": "system_alert",
+    "title": "Subscription Active",
+    "message": "Your Finora Demo Enterprise Workspace is fully active.",
+    "isRead": false,
+    "createdAt": "2026-06-25T08:00:00Z"
+  }
+]

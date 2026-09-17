@@ -1,0 +1,97 @@
+rules_version = "2";
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper: check if user is signed in
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // Helper: check if user is a system administrator
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.email == "aj5433433@gmail.com" ||
+        request.auth.token.get('admin', false) == true
+      );
+    }
+
+    // Helper: check if the user is an authenticated member of the organization
+    function isOrgMember(orgId) {
+      return isSignedIn() && (
+        isAdmin() ||
+        exists(/databases/$(database)/documents/organization_members/$(request.auth.uid + "_" + orgId)) ||
+        (resource != null && 'ownerId' in resource.data && resource.data.ownerId == request.auth.uid) ||
+        (resource != null && 'userId' in resource.data && resource.data.userId == request.auth.uid)
+      );
+    }
+
+    // Helper: check if user is the authenticated user
+    function isUser(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // 1. Organizations Collection and all subcollections
+    match /organizations/{orgId} {
+      allow read, write: if isOrgMember(orgId) || isAdmin();
+      allow create: if isSignedIn();
+      
+      // All subcollections under organization
+      match /{allSubcollections=**} {
+        allow read, write: if isOrgMember(orgId) || isAdmin();
+      }
+    }
+
+    // 2. Organization Members (Root collection for quick index and rules check)
+    // Document ID matches `${userId}_${orgId}`
+    match /organization_members/{membershipId} {
+      allow create: if isSignedIn() && (request.resource.data.userId == request.auth.uid || isAdmin());
+      allow get: if isSignedIn() && (
+        resource == null || 
+        resource.data.userId == request.auth.uid || 
+        isAdmin() ||
+        isOrgMember(resource.data.orgId)
+      );
+      allow update, delete: if isSignedIn() && (
+        resource.data.userId == request.auth.uid || 
+        isAdmin() ||
+        isOrgMember(resource.data.orgId)
+      );
+      allow list: if isSignedIn();
+    }
+
+    // 3. Shared Invoice Links (Public Client Portal)
+    match /shared_invoice_links/{linkId} {
+      // Members of the owning organization can manage share links, or if it is a demo link
+      allow create: if (isSignedIn() && (isOrgMember(request.resource.data.orgId) || isAdmin())) ||
+                       (request.resource.data.get('isDemo', false) == true);
+      allow delete: if isSignedIn() && (isOrgMember(resource.data.orgId) || isAdmin());
+      allow update: if (isSignedIn() && (isOrgMember(resource.data.orgId) || isAdmin())) || (
+        // Public can update status (e.g. paying) if valid and not revoked
+        (!('revoked' in resource.data) || resource.data.revoked == false) &&
+        // Ensure they only edit paid / paidAt fields and don't hijack other fields
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(["paid", "paidAt", "paid_at"])
+      );
+
+      // Public can view if token is valid (token is the ID)
+      allow get: if true;
+      allow list: if isSignedIn();
+    }
+
+    // 4. Master Demo Workspace (Read-only for all, writeable only by system administrators)
+    match /organizations/demo-workspace {
+      allow read: if true;
+      allow write: if isAdmin();
+
+      match /{allSubcollections=**} {
+        allow read: if true;
+        allow write: if isAdmin();
+      }
+    }
+
+    // 5. Connection / Health Check testing (Allows public connection check to succeed without permissions error)
+    match /test/{docId} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+  }
+}

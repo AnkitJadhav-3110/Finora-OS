@@ -1,0 +1,34 @@
+[
+  {
+    "id": "act-1",
+    "businessId": "demo-finora-tech",
+    "type": "invoice_created",
+    "label": "Invoice FIN-2026-0040 Created",
+    "detail": "Created invoice for Alpha Media Marketing Group ($1,416.00).",
+    "createdAt": "2026-06-15T12:00:00Z"
+  },
+  {
+    "id": "act-2",
+    "businessId": "demo-finora-tech",
+    "type": "client_added",
+    "label": "Client Alpha Media Added",
+    "detail": "Alpha Media Marketing Group added as an active billing client.",
+    "createdAt": "2026-05-15T11:00:00Z"
+  },
+  {
+    "id": "act-3",
+    "businessId": "demo-finora-tech",
+    "type": "expense_logged",
+    "label": "Expense Logged",
+    "detail": "Logged $1,450.00 expense from Amazon Web Services (Hosting).",
+    "createdAt": "2026-06-01T12:00:00Z"
+  },
+  {
+    "id": "act-4",
+    "businessId": "demo-finora-tech",
+    "type": "business_updated",
+    "label": "Business Details Configured",
+    "detail": "Updated Finora Technologies billing and tax metadata.",
+    "createdAt": "2026-01-11T09:00:00Z"
+  }
+]

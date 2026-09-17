@@ -1,0 +1,6 @@
+{
+  "name": "Finora",
+  "description": "The Financial Operating System for Modern Businesses — A production-ready multi-tenant business finance platform with organization-based sharing, subscription billing, and real-time operations.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
