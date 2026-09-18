@@ -580,8 +580,11 @@ export function useFirebaseSync() {
             const existingIdx = updatedInvoices.findIndex(i => i.id === docId);
             
             if (existingIdx > -1) {
+              const existingItems = updatedInvoices[existingIdx].items;
+              const newItems = Array.isArray(docData.items) && docData.items.length > 0 ? docData.items : existingItems;
               updatedInvoices[existingIdx] = {
                 ...updatedInvoices[existingIdx],
+                items: newItems,
                 status: docData.status as Invoice['status'],
                 statusHistory: docData.statusHistory || [],
                 subtotal: Number(docData.subtotal ?? 0),
@@ -592,29 +595,37 @@ export function useFirebaseSync() {
                 dueDate: docData.dueDate || new Date().toISOString(),
                 createdAt: docData.createdAt || new Date().toISOString(),
                 paymentQR: docData.paymentQr || undefined,
+                paymentTerms: docData.paymentTerms || updatedInvoices[existingIdx].paymentTerms,
+                customTemplateSnapshot: docData.customTemplateSnapshot || updatedInvoices[existingIdx].customTemplateSnapshot,
               };
             } else {
-              // Fetch newly added invoice's subcollection items
-              const itemsColRef = collection(db, 'organizations', orgId, 'invoices', docId, 'items');
-              const itemsSnapshot = await getDocs(itemsColRef);
-              const mappedItems = itemsSnapshot.docs.map(itemDocSnap => {
-                const item = itemDocSnap.data();
-                return {
-                  id: itemDocSnap.id,
-                  productName: item.productName || undefined,
-                  description: item.description,
-                  quantity: Number(item.quantity ?? 1),
-                  unit: item.unit || undefined,
-                  price: Number(item.rate ?? 0),
-                  taxRate: Number(item.taxRate ?? 0),
-                  discount: Number(item.discount ?? 0),
-                  discountType: (item.discountType || 'percentage') as 'percentage' | 'flat',
-                  hsn: item.hsn || undefined,
-                  amount: Number(item.amount ?? 0),
-                  order: Number(item.order ?? 0),
-                };
-              });
-              mappedItems.sort((a, b) => a.order - b.order);
+              // Fetch newly added invoice's items: from master doc or existing cache or subcollection
+              let mappedItems: InvoiceItem[] = Array.isArray(docData.items) && docData.items.length > 0
+                ? docData.items
+                : (useStore.getState().invoices.find(i => i.id === docId)?.items || []);
+
+              if (mappedItems.length === 0) {
+                const itemsColRef = collection(db, 'organizations', orgId, 'invoices', docId, 'items');
+                const itemsSnapshot = await getDocs(itemsColRef);
+                mappedItems = itemsSnapshot.docs.map(itemDocSnap => {
+                  const item = itemDocSnap.data();
+                  return {
+                    id: itemDocSnap.id,
+                    productName: item.productName || undefined,
+                    description: item.description || '',
+                    quantity: Number(item.quantity ?? 1),
+                    unit: item.unit || undefined,
+                    price: Number(item.rate ?? item.price ?? 0),
+                    taxRate: Number(item.taxRate ?? 0),
+                    discount: Number(item.discount ?? 0),
+                    discountType: (item.discountType || 'percentage') as 'percentage' | 'flat',
+                    hsn: item.hsn || undefined,
+                    amount: Number(item.amount ?? 0),
+                    order: Number(item.order ?? 0),
+                  };
+                });
+                mappedItems.sort((a, b) => a.order - b.order);
+              }
 
               updatedInvoices.push({
                 id: docId,
@@ -629,6 +640,8 @@ export function useFirebaseSync() {
                 status: docData.status as Invoice['status'],
                 statusHistory: docData.statusHistory || [],
                 template: docData.template as Invoice['template'],
+                customTemplateSnapshot: docData.customTemplateSnapshot || undefined,
+                paymentTerms: docData.paymentTerms || undefined,
                 createdAt: docData.createdAt || new Date().toISOString(),
                 dueDate: docData.dueDate || new Date().toISOString(),
                 notes: docData.notes || '',

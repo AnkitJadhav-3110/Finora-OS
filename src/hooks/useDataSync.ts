@@ -145,20 +145,28 @@ export function useDataSync() {
       const statusHistory = invoiceData.statusHistory || [{ status: invoiceData.status, timestamp: new Date().toISOString() }];
 
       // Write Invoice Master
+      const sanitizedSubtotal = Number(invoiceData.subtotal) || 0;
+      const sanitizedTaxTotal = Number(invoiceData.taxTotal) || 0;
+      const sanitizedDiscountTotal = Number(invoiceData.discountTotal) || 0;
+      const sanitizedTotal = Number(invoiceData.total) || 0;
+
       const invoiceDoc = {
         clientId: invoiceData.clientId,
         invoiceNumber: invoiceData.invoiceNumber,
         template: invoiceData.template,
-        subtotal: invoiceData.subtotal,
-        taxTotal: invoiceData.taxTotal,
-        discountTotal: invoiceData.discountTotal,
-        total: invoiceData.total,
+        subtotal: sanitizedSubtotal,
+        taxTotal: sanitizedTaxTotal,
+        discountTotal: sanitizedDiscountTotal,
+        total: sanitizedTotal,
         status: invoiceData.status,
         statusHistory,
         notes: invoiceData.notes || '',
         dueDate: invoiceData.dueDate,
-        isPaid: invoiceData.isPaid,
+        isPaid: !!invoiceData.isPaid,
         paymentQr: invoiceData.paymentQR || null,
+        paymentTerms: invoiceData.paymentTerms || 'net30',
+        customTemplateSnapshot: invoiceData.customTemplateSnapshot || null,
+        items: invoiceData.items || [],
         createdAt: invoiceData.createdAt || new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
@@ -170,13 +178,15 @@ export function useDataSync() {
         const item = invoiceData.items[index];
         const itemId = item.id || crypto.randomUUID();
         const itemRef = doc(db, 'organizations', activeOrgId, 'invoices', invoiceId, 'items', itemId);
+        const itemPrice = Number(item.price) || 0;
+        const itemQty = Number(item.quantity) || 1;
         await setDoc(itemRef, {
           description: item.description || '',
-          quantity: item.quantity,
-          rate: item.price,
-          taxRate: item.taxRate || 0,
-          discount: item.discount || 0,
-          amount: item.quantity * item.price,
+          quantity: itemQty,
+          rate: itemPrice,
+          taxRate: Number(item.taxRate) || 0,
+          discount: Number(item.discount) || 0,
+          amount: Number((itemQty * itemPrice).toFixed(2)),
           order: index,
         });
       }
@@ -187,18 +197,20 @@ export function useDataSync() {
         businessId: activeOrgId,
         clientId: invoiceData.clientId,
         items: invoiceData.items,
-        subtotal: invoiceData.subtotal,
-        taxTotal: invoiceData.taxTotal,
-        discountTotal: invoiceData.discountTotal,
-        total: invoiceData.total,
+        subtotal: sanitizedSubtotal,
+        taxTotal: sanitizedTaxTotal,
+        discountTotal: sanitizedDiscountTotal,
+        total: sanitizedTotal,
         status: invoiceData.status,
         statusHistory,
         template: invoiceData.template,
+        customTemplateSnapshot: invoiceData.customTemplateSnapshot,
+        paymentTerms: invoiceData.paymentTerms,
         createdAt: invoiceDoc.createdAt,
         dueDate: invoiceData.dueDate,
         notes: invoiceData.notes || '',
         paymentQR: invoiceData.paymentQR || undefined,
-        isPaid: invoiceData.isPaid,
+        isPaid: !!invoiceData.isPaid,
       };
 
       useStore.setState(state => ({ invoices: [invoice, ...state.invoices.filter(i => i.id !== invoiceId)] }));
@@ -221,12 +233,15 @@ export function useDataSync() {
       if (invoiceData.status !== undefined) updateData.status = invoiceData.status;
       if (invoiceData.isPaid !== undefined) updateData.isPaid = invoiceData.isPaid;
       if (invoiceData.notes !== undefined) updateData.notes = invoiceData.notes;
-      if (invoiceData.subtotal !== undefined) updateData.subtotal = invoiceData.subtotal;
-      if (invoiceData.taxTotal !== undefined) updateData.taxTotal = invoiceData.taxTotal;
-      if (invoiceData.discountTotal !== undefined) updateData.discountTotal = invoiceData.discountTotal;
-      if (invoiceData.total !== undefined) updateData.total = invoiceData.total;
+      if (invoiceData.subtotal !== undefined) updateData.subtotal = Number(invoiceData.subtotal) || 0;
+      if (invoiceData.taxTotal !== undefined) updateData.taxTotal = Number(invoiceData.taxTotal) || 0;
+      if (invoiceData.discountTotal !== undefined) updateData.discountTotal = Number(invoiceData.discountTotal) || 0;
+      if (invoiceData.total !== undefined) updateData.total = Number(invoiceData.total) || 0;
       if (invoiceData.template !== undefined) updateData.template = invoiceData.template;
       if (invoiceData.paymentQR !== undefined) updateData.paymentQr = invoiceData.paymentQR;
+      if (invoiceData.paymentTerms !== undefined) updateData.paymentTerms = invoiceData.paymentTerms;
+      if (invoiceData.customTemplateSnapshot !== undefined) updateData.customTemplateSnapshot = invoiceData.customTemplateSnapshot;
+      if (invoiceData.items !== undefined) updateData.items = invoiceData.items;
 
       const updatedInvoice = useStore.getState().invoices.find(i => i.id === id);
       if (updatedInvoice?.statusHistory) {

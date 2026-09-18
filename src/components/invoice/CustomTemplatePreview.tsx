@@ -53,7 +53,7 @@ export function CustomTemplatePreview({
         backgroundPosition: 'center',
       }}
     >
-      {template.fieldMappings.map((field) => {
+      {(template.fieldMappings || []).map((field) => {
         const leftPercent = (field.x / 800) * 100;
         const topPercent = (field.y / 600) * 100;
         const widthPercent = (field.width / 800) * 100;

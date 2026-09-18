@@ -50,23 +50,28 @@ export class DocumentRenderer {
     let calculatedDiscountTotal = 0;
     let calculatedTaxTotal = 0;
 
-    const items: RenderModelItem[] = document.items.map((item: DocumentItem) => {
-      const lineTotal = item.quantity * item.price;
+    const rawItems = Array.isArray(document.items) ? document.items : [];
+    const items: RenderModelItem[] = rawItems.map((item: DocumentItem) => {
+      const qty = Number(item.quantity) || 0;
+      const price = Number(item.price) || 0;
+      const lineTotal = qty * price;
       
       // Compute line discount
       let lineDiscount = 0;
-      if (item.discount > 0) {
+      const discountVal = Number(item.discount) || 0;
+      if (discountVal > 0) {
         if (item.discountType === 'flat') {
-          lineDiscount = item.discount;
+          lineDiscount = discountVal;
         } else {
           // Default to percentage
-          lineDiscount = lineTotal * (item.discount / 100);
+          lineDiscount = lineTotal * (discountVal / 100);
         }
       }
 
       // Compute line tax (applied after discount)
-      const taxableAmount = lineTotal - lineDiscount;
-      const lineTax = taxableAmount * (item.taxRate / 100);
+      const taxableAmount = Math.max(0, lineTotal - lineDiscount);
+      const taxRateVal = Number(item.taxRate) || 0;
+      const lineTax = taxableAmount * (taxRateVal / 100);
       const totalAmount = taxableAmount + lineTax;
 
       calculatedSubtotal += lineTotal;
@@ -75,6 +80,10 @@ export class DocumentRenderer {
 
       return {
         ...item,
+        quantity: qty,
+        price,
+        discount: discountVal,
+        taxRate: taxRateVal,
         discountAmount: lineDiscount,
         taxAmount: lineTax,
         totalAmount: totalAmount,

@@ -8,6 +8,9 @@ import {
   Download,
   Eye,
   Save,
+  Send,
+  Building2,
+  UserPlus,
   RefreshCw,
   Paperclip,
   X,
@@ -21,13 +24,21 @@ import { useAuthGuard } from '@/hooks/useAuthGuard';
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { storage, db } from '@/lib/firebase';
 import { doc, setDoc, deleteDoc, collection, getDocs } from 'firebase/firestore';
-import type { InvoiceItem, InvoiceTemplate, InvoiceAttachment } from '@/store/useStore';
+import type { InvoiceItem, InvoiceTemplate, InvoiceAttachment, Business } from '@/store/useStore';
 import { PageHeader } from '@/components/ui/page-header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
 import {
   Select,
   SelectContent,
@@ -74,18 +85,34 @@ export default function CreateInvoice() {
     products = [],
     settings,
     currentBusinessId,
+    setCurrentBusiness,
+    addBusiness,
     getNextInvoiceNumber,
     customTemplates = [],
   } = useStore();
-  const { addInvoice, updateInvoice } = useDataSync();
+  const { addInvoice, updateInvoice, addClient } = useDataSync();
 
   const editingInvoice = editId ? invoices.find(i => i.id === editId) : null;
 
-  const [invoiceNumber, setInvoiceNumber] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+  const [showAddClientModal, setShowAddClientModal] = useState(false);
+  const [newClientName, setNewClientName] = useState('');
+  const [newClientEmail, setNewClientEmail] = useState('');
+  const [newClientPhone, setNewClientPhone] = useState('');
+  const [newClientAddress, setNewClientAddress] = useState('');
+  const [isAddingClient, setIsAddingClient] = useState(false);
+
+  const [invoiceNumber, setInvoiceNumber] = useState(() => {
+    return useStore.getState().getNextInvoiceNumber() || `INV-${Date.now().toString().slice(-6)}`;
+  });
   const [selectedClientId, setSelectedClientId] = useState('');
-  const [invoiceDate, setInvoiceDate] = useState(new Date().toISOString().split('T')[0]);
-  const [paymentTerm, setPaymentTerm] = useState<string>(settings.defaultPaymentTerms);
-  const [dueDate, setDueDate] = useState('');
+  const [invoiceDate, setInvoiceDate] = useState(() => new Date().toISOString().split('T')[0]);
+  const [paymentTerm, setPaymentTerm] = useState<string>(settings.defaultPaymentTerms || 'net30');
+  const [dueDate, setDueDate] = useState(() => {
+    const d = new Date();
+    d.setDate(d.getDate() + 30);
+    return d.toISOString().split('T')[0];
+  });
   const [template, setTemplate] = useState<InvoiceTemplate>('minimalWhite');
   const [notes, setNotes] = useState('');
   const [paymentQR, setPaymentQR] = useState('');
@@ -101,18 +128,78 @@ export default function CreateInvoice() {
   const { user } = useAuth();
   const { ensureAuth, ensureOwnsInvoice } = useAuthGuard();
 
+  // Ensure active business is selected
+  useEffect(() => {
+    if (!currentBusinessId && businesses.length > 0) {
+      setCurrentBusiness(businesses[0].id);
+    }
+  }, [currentBusinessId, businesses, setCurrentBusiness]);
+
+  // Auto-select single client if available
+  useEffect(() => {
+    if (!selectedClientId && clients.length === 1) {
+      setSelectedClientId(clients[0].id);
+    }
+  }, [selectedClientId, clients]);
+
+  // Quick Client Creation handler
+  const handleQuickAddClient = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newClientName.trim()) {
+      toast.error('Client name is required');
+      return;
+    }
+    setIsAddingClient(true);
+    try {
+      const activeBizId = currentBusinessId || businesses[0]?.id || '';
+      const createdId = await addClient({
+        name: newClientName.trim(),
+        email: newClientEmail.trim() || undefined,
+        phone: newClientPhone.trim() || undefined,
+        address: newClientAddress.trim() || undefined,
+        businessId: activeBizId,
+      });
+      if (createdId) {
+        setSelectedClientId(createdId);
+        toast.success(`Client "${newClientName.trim()}" added and selected`);
+      }
+      setShowAddClientModal(false);
+      setNewClientName('');
+      setNewClientEmail('');
+      setNewClientPhone('');
+      setNewClientAddress('');
+    } catch (err) {
+      console.error('Failed to create client:', err);
+      toast.error('Failed to create client');
+    } finally {
+      setIsAddingClient(false);
+    }
+  };
+
   // Load editing invoice data
   useEffect(() => {
     if (editingInvoice) {
-      setInvoiceNumber(editingInvoice.invoiceNumber);
-      setSelectedClientId(editingInvoice.clientId);
-      setInvoiceDate(new Date(editingInvoice.createdAt).toISOString().split('T')[0]);
-      setDueDate(new Date(editingInvoice.dueDate).toISOString().split('T')[0]);
-      setTemplate(editingInvoice.template);
-      setNotes(editingInvoice.notes);
+      setInvoiceNumber(editingInvoice.invoiceNumber || '');
+      setSelectedClientId(editingInvoice.clientId || '');
+      try {
+        const created = new Date(editingInvoice.createdAt);
+        setInvoiceDate(!isNaN(created.getTime()) ? created.toISOString().split('T')[0] : new Date().toISOString().split('T')[0]);
+      } catch {
+        setInvoiceDate(new Date().toISOString().split('T')[0]);
+      }
+      try {
+        const due = new Date(editingInvoice.dueDate);
+        setDueDate(!isNaN(due.getTime()) ? due.toISOString().split('T')[0] : new Date().toISOString().split('T')[0]);
+      } catch {
+        setDueDate(new Date().toISOString().split('T')[0]);
+      }
+      setTemplate(editingInvoice.template || 'minimalWhite');
+      setNotes(editingInvoice.notes || '');
       setPaymentQR(editingInvoice.paymentQR || '');
-      setShowPaidStamp(editingInvoice.isPaid);
-      setItems(editingInvoice.items.map(item => ({ ...item })));
+      setShowPaidStamp(!!editingInvoice.isPaid);
+      if (Array.isArray(editingInvoice.items) && editingInvoice.items.length > 0) {
+        setItems(editingInvoice.items.map(item => ({ ...item })));
+      }
     } else {
       // Support pre-selecting a custom template via URL query param: /invoices/create?template=<templateId>
       const templateParam = searchParams.get('template');
@@ -122,7 +209,7 @@ export default function CreateInvoice() {
     }
   }, [editingInvoice, searchParams]);
 
-  const currentBusiness = businesses.find(b => b.id === currentBusinessId);
+  const currentBusiness = businesses.find(b => b.id === currentBusinessId) || businesses[0];
   const selectedClient = clients.find(c => c.id === selectedClientId);
 
   // Auto-set currency when client changes
@@ -169,9 +256,15 @@ export default function CreateInvoice() {
     if (editId) return; // Don't auto-calculate due date when editing
     const term = paymentTerms.find(t => t.value === paymentTerm);
     if (term && invoiceDate) {
-      const date = new Date(invoiceDate);
-      date.setDate(date.getDate() + term.days);
-      setDueDate(date.toISOString().split('T')[0]);
+      try {
+        const date = new Date(invoiceDate);
+        if (!isNaN(date.getTime())) {
+          date.setDate(date.getDate() + term.days);
+          setDueDate(date.toISOString().split('T')[0]);
+        }
+      } catch (err) {
+        console.warn('Error calculating due date:', err);
+      }
     }
   }, [paymentTerm, invoiceDate, editId]);
 
@@ -181,21 +274,33 @@ export default function CreateInvoice() {
     let discountTotal = 0;
 
     items.forEach(item => {
-      const lineTotal = item.quantity * item.price;
-      const lineDiscount = lineTotal * (item.discount / 100);
-      const lineTax = (lineTotal - lineDiscount) * (item.taxRate / 100);
+      const qty = Math.max(0, Number(item.quantity) || 0);
+      const prc = Math.max(0, Number(item.price) || 0);
+      const disc = Math.min(100, Math.max(0, Number(item.discount) || 0));
+      const tx = Math.max(0, Number(item.taxRate) || 0);
+
+      const lineTotal = qty * prc;
+      const lineDiscount = lineTotal * (disc / 100);
+      const lineTax = (lineTotal - lineDiscount) * (tx / 100);
 
       subtotal += lineTotal;
       discountTotal += lineDiscount;
       taxTotal += lineTax;
     });
 
-    const total = subtotal - discountTotal + taxTotal;
-    return { subtotal, taxTotal, discountTotal, total };
+    const total = Math.max(0, subtotal - discountTotal + taxTotal);
+    return {
+      subtotal: Number(subtotal.toFixed(2)),
+      taxTotal: Number(taxTotal.toFixed(2)),
+      discountTotal: Number(discountTotal.toFixed(2)),
+      total: Number(total.toFixed(2)),
+    };
   }, [items]);
 
   const formatCurrency = (amount: number) => {
-    return `${invoiceCurrency}${amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+    const safeAmount = Number(amount) || 0;
+    const symbol = invoiceCurrency || settings?.currencySymbol || '$';
+    return `${symbol}${safeAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   };
 
   const handleFileUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -318,19 +423,56 @@ export default function CreateInvoice() {
   const handleSave = async (status: 'draft' | 'sent' = 'draft') => {
     if (!ensureAuth()) return;
     if (editId && !(await ensureOwnsInvoice(editId))) return;
-    if (!currentBusinessId) {
-      toast.error('Please select a business profile');
+
+    // 1. Ensure active business exists
+    let activeBizId = currentBusinessId || businesses[0]?.id;
+    if (!activeBizId) {
+      const newBizId = crypto.randomUUID();
+      const defaultBiz: Business = {
+        id: newBizId,
+        name: user?.displayName ? `${user.displayName}'s Business` : 'My Business',
+        email: user?.email || 'billing@example.com',
+        phone: '',
+        address: '',
+        city: '',
+        country: 'US',
+        taxId: '',
+        currency: settings.defaultCurrency || 'USD',
+        currencySymbol: settings.currencySymbol || '$',
+        createdAt: new Date().toISOString(),
+      };
+      addBusiness(defaultBiz);
+      setCurrentBusiness(newBizId);
+      activeBizId = newBizId;
+    }
+
+    // 2. Ensure client selected
+    if (!selectedClientId) {
+      toast.error('Please select or add a client before saving');
       return;
     }
 
+    // 3. Ensure items have clean numbers & non-empty descriptions
+    const validItems = items.map((it, idx) => ({
+      ...it,
+      description: it.description?.trim() || `Item ${idx + 1}`,
+      quantity: Math.max(1, Number(it.quantity) || 1),
+      price: Math.max(0, Number(it.price) || 0),
+      taxRate: Math.max(0, Number(it.taxRate) || 0),
+      discount: Math.max(0, Number(it.discount) || 0),
+    }));
+
+    const finalInvoiceNumber = invoiceNumber.trim() || getNextInvoiceNumber() || `INV-${Date.now().toString().slice(-6)}`;
+    const finalDueDate = dueDate || invoiceDate;
+
     const result = invoiceSchema.safeParse({
-      invoiceNumber,
+      invoiceNumber: finalInvoiceNumber,
       clientId: selectedClientId,
       invoiceDate,
-      dueDate,
+      dueDate: finalDueDate,
       notes,
       paymentQR,
-      items,
+      items: validItems,
     });
 
     if (!result.success) {
@@ -338,67 +480,76 @@ export default function CreateInvoice() {
       return;
     }
 
-    const customTemplateMatch = customTemplates.find(
-      (ct) => ct.id === template || ct.templateId === template || ct.name === template
-    );
-    // Freeze an immutable snapshot of the custom template so future updates or deletions never break this invoice
-    const customTemplateSnapshot = customTemplateMatch
-      ? JSON.parse(JSON.stringify(customTemplateMatch))
-      : (editingInvoice?.customTemplateSnapshot || undefined);
+    setIsSaving(true);
+    try {
+      const customTemplateMatch = customTemplates.find(
+        (ct) => ct.id === template || ct.templateId === template || ct.name === template
+      );
+      // Freeze an immutable snapshot of the custom template so future updates or deletions never break this invoice
+      const customTemplateSnapshot = customTemplateMatch
+        ? JSON.parse(JSON.stringify(customTemplateMatch))
+        : (editingInvoice?.customTemplateSnapshot || undefined);
 
-    const invoiceData = {
-      invoiceNumber,
-      businessId: currentBusinessId,
-      clientId: selectedClientId,
-      items,
-      subtotal: calculations.subtotal,
-      taxTotal: calculations.taxTotal,
-      discountTotal: calculations.discountTotal,
-      total: calculations.total,
-      status,
-      template,
-      customTemplateSnapshot,
-      paymentTerms: paymentTerm,
-      paymentUrl: paymentQR || (invoiceNumber && typeof window !== 'undefined' ? `${window.location.origin}/portal/${invoiceNumber}` : ''),
-      createdAt: new Date(invoiceDate).toISOString(),
-      dueDate: new Date(dueDate).toISOString(),
-      notes,
-      paymentQR,
-      isPaid: showPaidStamp,
-    };
+      const invoiceData = {
+        invoiceNumber: finalInvoiceNumber,
+        businessId: activeBizId,
+        clientId: selectedClientId,
+        items: validItems,
+        subtotal: calculations.subtotal,
+        taxTotal: calculations.taxTotal,
+        discountTotal: calculations.discountTotal,
+        total: calculations.total,
+        status,
+        template,
+        customTemplateSnapshot,
+        paymentTerms: paymentTerm,
+        paymentUrl: paymentQR || (finalInvoiceNumber && typeof window !== 'undefined' ? `${window.location.origin}/portal/${finalInvoiceNumber}` : ''),
+        createdAt: new Date(invoiceDate).toISOString(),
+        dueDate: new Date(finalDueDate).toISOString(),
+        notes,
+        paymentQR,
+        isPaid: showPaidStamp,
+      };
 
-    let invoiceId = editId;
-    if (editId && editingInvoice) {
-      await updateInvoice(editId, invoiceData);
-      toast.success('Invoice updated successfully');
-    } else {
-      const newId = await addInvoice(invoiceData);
-      invoiceId = typeof newId === 'string' ? newId : null;
-      toast.success(`Invoice ${status === 'draft' ? 'saved as draft' : 'created'}`);
-    }
+      let invoiceId = editId;
+      if (editId && editingInvoice) {
+        await updateInvoice(editId, invoiceData);
+        toast.success('Invoice updated successfully');
+      } else {
+        const newId = await addInvoice(invoiceData);
+        invoiceId = typeof newId === 'string' ? newId : null;
+        toast.success(`Invoice ${status === 'draft' ? 'saved as draft' : 'created successfully'}`);
+      }
 
-    // Save attachments to DB
-    if (invoiceId && user && attachments.length > 0) {
-      const activeOrgId = useStore.getState().currentBusinessId;
-      if (activeOrgId) {
-        for (const att of attachments) {
-          if (!att.invoiceId || att.invoiceId === '') {
-            const attachmentRef = doc(db, 'organizations', activeOrgId, 'invoices', invoiceId, 'attachments', att.id);
-            await setDoc(attachmentRef, {
-              ...att,
-              invoiceId: invoiceId, // Bind to actual invoice ID
-            });
+      // Save attachments to DB
+      if (invoiceId && user && attachments.length > 0) {
+        const activeOrgId = useStore.getState().currentBusinessId || activeBizId;
+        if (activeOrgId) {
+          for (const att of attachments) {
+            if (!att.invoiceId || att.invoiceId === '') {
+              const attachmentRef = doc(db, 'organizations', activeOrgId, 'invoices', invoiceId, 'attachments', att.id);
+              await setDoc(attachmentRef, {
+                ...att,
+                invoiceId: invoiceId, // Bind to actual invoice ID
+              }).catch(console.warn);
+            }
           }
         }
       }
-    }
 
-    navigate('/invoices/history');
+      navigate('/invoices/history');
+    } catch (err: any) {
+      console.error('Failed to save invoice:', err);
+      toast.error(err?.message || 'Failed to save invoice');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleDownload = async () => {
     if (!ensureAuth()) return;
-    if (!currentBusiness || !selectedClient) {
+    const activeBiz = currentBusiness || businesses[0];
+    if (!activeBiz || !selectedClient) {
       toast.error('Please select business and client');
       return;
     }
@@ -409,8 +560,8 @@ export default function CreateInvoice() {
 
     const invoice = {
       id: editId || '',
-      invoiceNumber,
-      businessId: currentBusinessId!,
+      invoiceNumber: invoiceNumber.trim() || getNextInvoiceNumber(),
+      businessId: activeBiz.id,
       clientId: selectedClientId,
       items,
       subtotal: calculations.subtotal,
@@ -430,7 +581,7 @@ export default function CreateInvoice() {
     };
 
     try {
-      await downloadInvoicePDF(invoice, selectedClient, currentBusiness, settings);
+      await downloadInvoicePDF(invoice, selectedClient, activeBiz, settings);
       toast.success('Invoice downloaded');
     } catch (error) {
       toast.error('Failed to generate PDF');
@@ -449,20 +600,24 @@ export default function CreateInvoice() {
         title={editId ? 'Edit Invoice' : 'Create Invoice'}
         description={editId ? `Editing ${invoiceNumber}` : 'Fill in the details to generate your invoice'}
         action={
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             {!editId && (
-              <Button variant="outline" onClick={() => setShowRecurringDialog(true)}>
+              <Button variant="outline" size="sm" onClick={() => setShowRecurringDialog(true)}>
                 <RefreshCw className="w-4 h-4 mr-2" />
                 Make Recurring
               </Button>
             )}
-            <Button variant="outline" onClick={() => handleSave('draft')}>
+            <Button variant="outline" size="sm" onClick={() => handleSave('draft')} disabled={isSaving}>
               <Save className="w-4 h-4 mr-2" />
-              {editId ? 'Update Invoice' : 'Save Draft'}
+              {editId ? 'Update Draft' : 'Save Draft'}
             </Button>
-            <Button onClick={handleDownload}>
+            <Button size="sm" onClick={() => handleSave('sent')} disabled={isSaving} className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold">
+              <Send className="w-4 h-4 mr-2" />
+              {editId ? 'Update & Finalize' : 'Create Invoice'}
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleDownload} disabled={isSaving}>
               <Download className="w-4 h-4 mr-2" />
-              Download PDF
+              PDF
             </Button>
           </div>
         }
@@ -511,6 +666,40 @@ export default function CreateInvoice() {
               <CardTitle className="text-lg">Invoice Details</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
+              {/* Business Profile Selector */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label className="flex items-center gap-1.5 text-xs font-medium text-foreground">
+                    <Building2 className="w-3.5 h-3.5 text-muted-foreground" />
+                    Issuing Business Profile
+                  </Label>
+                  {currentBusiness && (
+                    <span className="text-[11px] text-muted-foreground">
+                      Currency: <strong className="text-foreground">{currentBusiness.currencySymbol || '$'} {currentBusiness.currency || 'USD'}</strong>
+                    </span>
+                  )}
+                </div>
+                {businesses.length > 1 ? (
+                  <Select value={currentBusinessId || businesses[0]?.id} onValueChange={(val) => setCurrentBusiness(val)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select business profile" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {businesses.map((b) => (
+                        <SelectItem key={b.id} value={b.id}>
+                          {b.name} {b.taxId ? `(${b.taxId})` : ''}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <div className="flex items-center justify-between p-2.5 rounded-lg border bg-muted/20 text-sm">
+                    <span className="font-medium text-foreground">{currentBusiness?.name || businesses[0]?.name || 'Default Business'}</span>
+                    <span className="text-xs text-muted-foreground">{currentBusiness?.email || businesses[0]?.email}</span>
+                  </div>
+                )}
+              </div>
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Invoice Number</Label>
@@ -555,15 +744,27 @@ export default function CreateInvoice() {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label>Client</Label>
+                <div className="flex items-center justify-between">
+                  <Label>Client</Label>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowAddClientModal(true)}
+                    className="h-7 px-2 text-xs font-medium text-primary hover:text-primary/80 hover:bg-primary/10"
+                  >
+                    <UserPlus className="w-3.5 h-3.5 mr-1" />
+                    Add Client
+                  </Button>
+                </div>
                 <Select value={selectedClientId} onValueChange={setSelectedClientId}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a client" />
+                    <SelectValue placeholder={clients.length === 0 ? "No clients found — add one" : "Select a client"} />
                   </SelectTrigger>
                   <SelectContent>
                     {clients.map(client => (
                       <SelectItem key={client.id} value={client.id}>
-                        {client.name}
+                        {client.name} {client.email ? `(${client.email})` : ''}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -897,6 +1098,30 @@ export default function CreateInvoice() {
               </div>
             </CardContent>
           </Card>
+
+          {/* Action Footer Card */}
+          <Card className="shadow-card border-primary/20 bg-card">
+            <CardContent className="p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div>
+                <p className="text-xs text-muted-foreground font-medium">Invoice Grand Total</p>
+                <p className="text-2xl font-bold tracking-tight text-foreground">{formatCurrency(calculations.total)}</p>
+              </div>
+              <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto justify-end">
+                <Button variant="outline" onClick={() => handleSave('draft')} disabled={isSaving}>
+                  <Save className="w-4 h-4 mr-2" />
+                  {editId ? 'Update Draft' : 'Save as Draft'}
+                </Button>
+                <Button onClick={() => handleSave('sent')} disabled={isSaving} className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-sm">
+                  <Send className="w-4 h-4 mr-2" />
+                  {editId ? 'Update & Finalize' : 'Create & Finalize'}
+                </Button>
+                <Button variant="outline" onClick={handleDownload} disabled={isSaving}>
+                  <Download className="w-4 h-4 mr-2" />
+                  PDF
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         <div className={cn("xl:sticky xl:top-24 h-fit", activeTab === 'form' && "hidden xl:block")}>
@@ -941,6 +1166,73 @@ export default function CreateInvoice() {
         </div>
       </div>
     </div>
+
+    {/* Quick Add Client Dialog */}
+    <Dialog open={showAddClientModal} onOpenChange={setShowAddClientModal}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <UserPlus className="w-5 h-5 text-primary" />
+            Add New Client
+          </DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleQuickAddClient} className="space-y-4 pt-2">
+          <div className="space-y-2">
+            <Label htmlFor="client-name">Client Name *</Label>
+            <Input
+              id="client-name"
+              placeholder="e.g. Acme Corp or John Doe"
+              value={newClientName}
+              onChange={(e) => setNewClientName(e.target.value)}
+              required
+            />
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="space-y-2">
+              <Label htmlFor="client-email">Email</Label>
+              <Input
+                id="client-email"
+                type="email"
+                placeholder="billing@acme.com"
+                value={newClientEmail}
+                onChange={(e) => setNewClientEmail(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="client-phone">Phone</Label>
+              <Input
+                id="client-phone"
+                placeholder="+1 555-0199"
+                value={newClientPhone}
+                onChange={(e) => setNewClientPhone(e.target.value)}
+              />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="client-address">Billing Address</Label>
+            <Input
+              id="client-address"
+              placeholder="Street, City, State, ZIP"
+              value={newClientAddress}
+              onChange={(e) => setNewClientAddress(e.target.value)}
+            />
+          </div>
+          <DialogFooter className="pt-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowAddClientModal(false)}
+              disabled={isAddingClient}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" disabled={isAddingClient}>
+              {isAddingClient ? 'Creating...' : 'Save & Select Client'}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
     </>
   );
 }

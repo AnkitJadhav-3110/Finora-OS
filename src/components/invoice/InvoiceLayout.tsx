@@ -67,21 +67,36 @@ export function InvoiceLayout({ invoice, client, business, settings, portalUrl }
     );
   }
 
-  // Compile full rendering model using central engine for standard built-in templates
-  const renderModel = DocumentRenderer.render(
-    invoice,
-    fallbackClient,
-    fallbackBusiness,
-    settings,
-    undefined,
-    portalUrl
-  );
+  try {
+    // Compile full rendering model using central engine for standard built-in templates
+    const renderModel = DocumentRenderer.render(
+      invoice,
+      fallbackClient,
+      fallbackBusiness,
+      settings,
+      undefined,
+      portalUrl
+    );
 
-  return (
-    <div className="w-full print:p-0 print:shadow-none print:border-none print:bg-white select-none">
-      <PreviewRenderer model={renderModel} />
-    </div>
-  );
+    return (
+      <div className="w-full print:p-0 print:shadow-none print:border-none print:bg-white select-none">
+        <PreviewRenderer model={renderModel} />
+      </div>
+    );
+  } catch (renderError) {
+    console.warn('Preview rendering fallback engaged:', renderError);
+    return (
+      <div className="w-full p-6 bg-card border rounded-lg text-center space-y-2">
+        <p className="font-semibold text-foreground">Invoice Preview</p>
+        <p className="text-sm text-muted-foreground">
+          Invoice #{invoice?.invoiceNumber || 'Draft'} • Total: {settings?.currencySymbol || '$'}{Number(invoice?.total || 0).toFixed(2)}
+        </p>
+        <p className="text-xs text-muted-foreground">
+          Complete the form details to view the high-resolution styled preview.
+        </p>
+      </div>
+    );
+  }
 }
 
 export default InvoiceLayout;

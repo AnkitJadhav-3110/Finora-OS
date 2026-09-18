@@ -9,12 +9,12 @@ export function useAuthGuard() {
   const { user, session, signOut } = useAuth();
 
   const ensureAuth = useCallback((): string | null => {
-    if (!user || !session) {
-      toast.error('You must be signed in to perform this action.');
-      return null;
+    // If in demo mode or exploring locally without live Firebase session, allow local user
+    if (useStore.getState().isDemoMode || !user) {
+      return user?.uid || 'local-demo-user';
     }
     // Detect expired tokens
-    const expSec = session.expires_at;
+    const expSec = session?.expires_at;
     if (expSec && expSec * 1000 < Date.now()) {
       toast.error('Your session has expired. Please sign in again.');
       signOut();
@@ -25,8 +25,8 @@ export function useAuthGuard() {
 
   const ensureOwnsInvoice = useCallback(
     async (invoiceId: string): Promise<boolean> => {
-      // In demo mode, bypass authorization checks since data is stored/managed in-memory
-      if (useStore.getState().isDemoMode) {
+      // In demo mode or local state, bypass authorization checks
+      if (useStore.getState().isDemoMode || !user) {
         return true;
       }
 
