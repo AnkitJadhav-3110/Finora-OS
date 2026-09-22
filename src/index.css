@@ -6,122 +6,137 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222 47% 11%;
+    /* Base Finora Semantic Tokens (Light) */
+    --background: 210 40% 98%;          /* #F8FAFC crisp architectural canvas */
+    --foreground: 222 47% 11%;          /* #0F172A deep high-contrast text */
 
-    --card: 0 0% 100%;
+    --surface: 0 0% 100%;               /* #FFFFFF primary flat surface */
+    --surface-elevated: 210 40% 96%;    /* #F1F5F9 elevated card / dialog */
+    --surface-hover: 210 40% 95%;       /* #EDF2F7 hover surface */
+
+    --card: 0 0% 100%;                  /* #FFFFFF */
     --card-foreground: 222 47% 11%;
 
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
 
-    --primary: 221 83% 53%;
+    --primary: 221 83% 53%;             /* Finora Blue #2563EB */
     --primary-foreground: 0 0% 100%;
 
     --secondary: 210 40% 96%;
     --secondary-foreground: 222 47% 11%;
 
     --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 47%;
+    --muted-foreground: 215 16% 47%;     /* #64748B text muted */
 
     --accent: 210 40% 96%;
     --accent-foreground: 222 47% 11%;
 
-    --destructive: 0 84% 60%;
+    --destructive: 0 84% 58%;           /* Danger Red #DC2626 */
     --destructive-foreground: 0 0% 100%;
 
-    --success: 142 76% 36%;
+    --success: 160 84% 36%;             /* Emerald Success #059669 */
     --success-foreground: 0 0% 100%;
 
-    --warning: 38 92% 50%;
+    --warning: 38 92% 46%;              /* Amber Warning #D97706 */
     --warning-foreground: 0 0% 100%;
 
-    --border: 214 32% 91%;
+    --info: 199 89% 42%;                /* Sky Info #0284C7 */
+    --info-foreground: 0 0% 100%;
+
+    --text-primary: 222 47% 11%;
+    --text-secondary: 215 25% 27%;
+    --text-muted: 215 16% 47%;
+
+    --border: 214 32% 91%;              /* #E2E8F0 */
     --input: 214 32% 91%;
     --ring: 221 83% 53%;
 
-    --radius: 0.75rem;
+    --radius: 0.625rem;                 /* 10px disciplined modern radius */
 
-    --sidebar-background: 0 0% 99%;
+    --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 222 47% 15%;
     --sidebar-primary: 221 83% 53%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 221 83% 95%;
+    --sidebar-accent: 221 83% 96%;
     --sidebar-accent-foreground: 222 47% 15%;
-    --sidebar-border: 214 32% 88%;
+    --sidebar-border: 214 32% 91%;
     --sidebar-ring: 221 83% 53%;
 
-    /* Custom gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(221 83% 53%) 0%, hsl(250 83% 60%) 100%);
-    --gradient-success: linear-gradient(135deg, hsl(142 76% 36%) 0%, hsl(160 84% 39%) 100%);
-    --gradient-warning: linear-gradient(135deg, hsl(38 92% 50%) 0%, hsl(25 95% 53%) 100%);
-    --gradient-hero: linear-gradient(135deg, hsl(221 83% 53% / 0.1) 0%, hsl(250 83% 60% / 0.05) 100%);
-    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(210 40% 98%) 100%);
+    /* Micro-elevations */
+    --shadow-xs: 0 1px 2px 0 hsl(222 47% 11% / 0.04);
+    --shadow-sm: 0 1px 3px 0 hsl(222 47% 11% / 0.06), 0 1px 2px -1px hsl(222 47% 11% / 0.06);
+    --shadow-md: 0 4px 6px -1px hsl(222 47% 11% / 0.08), 0 2px 4px -2px hsl(222 47% 11% / 0.06);
+    --shadow-lg: 0 10px 15px -3px hsl(222 47% 11% / 0.08), 0 4px 6px -4px hsl(222 47% 11% / 0.04);
+    --shadow-card: 0 1px 3px 0 hsl(222 47% 11% / 0.05);
 
-    /* Shadows */
-    --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.05);
-    --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.1), 0 2px 4px -2px hsl(0 0% 0% / 0.1);
-    --shadow-lg: 0 10px 15px -3px hsl(0 0% 0% / 0.1), 0 4px 6px -4px hsl(0 0% 0% / 0.1);
-    --shadow-xl: 0 20px 25px -5px hsl(0 0% 0% / 0.1), 0 8px 10px -6px hsl(0 0% 0% / 0.1);
-    --shadow-glow: 0 0 40px hsl(221 83% 53% / 0.15);
-    --shadow-card: 0 1px 3px hsl(0 0% 0% / 0.05), 0 1px 2px hsl(0 0% 0% / 0.1);
-
-    /* Animations */
+    /* Subtle transitions */
     --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
     --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
     --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .dark {
-    --background: 222 47% 6%;
-    --foreground: 210 40% 98%;
+    /* Base Finora Semantic Tokens (Dark - Refined SaaS OS) */
+    --background: 213 29% 6%;           /* #0B0F14 deep background */
+    --foreground: 210 40% 96%;          /* #F1F5F9 text primary */
 
-    --card: 222 47% 8%;
-    --card-foreground: 210 40% 98%;
+    --surface: 216 31% 10%;             /* #111720 primary surface */
+    --surface-elevated: 215 28% 12%;    /* #161D27 elevated surface */
+    --surface-hover: 218 28% 15%;       /* #1C2432 hover surface */
 
-    --popover: 222 47% 8%;
-    --popover-foreground: 210 40% 98%;
+    --card: 216 31% 10%;                /* #111720 */
+    --card-foreground: 210 40% 96%;
 
-    --primary: 221 83% 58%;
+    --popover: 215 28% 12%;             /* #161D27 */
+    --popover-foreground: 210 40% 96%;
+
+    --primary: 221 83% 58%;             /* Finora Blue #3B82F6 */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 217 33% 17%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 215 28% 13%;
+    --secondary-foreground: 210 40% 96%;
 
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 20% 65%;
+    --muted: 215 25% 14%;
+    --muted-foreground: 215 16% 62%;    /* #94A3B8 text secondary/muted */
 
-    --accent: 217 33% 17%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 215 25% 15%;
+    --accent-foreground: 210 40% 96%;
 
-    --destructive: 0 63% 31%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 84% 60%;           /* Danger Red #EF4444 */
+    --destructive-foreground: 0 0% 100%;
 
-    --success: 142 76% 30%;
-    --success-foreground: 210 40% 98%;
+    --success: 160 84% 39%;             /* Emerald Success #10B981 */
+    --success-foreground: 0 0% 100%;
 
-    --warning: 38 92% 40%;
-    --warning-foreground: 210 40% 98%;
+    --warning: 38 92% 50%;              /* Amber Warning #F59E0B */
+    --warning-foreground: 0 0% 100%;
 
-    --border: 217 33% 20%;
-    --input: 217 33% 20%;
+    --info: 199 89% 48%;                /* Sky Info #0EA5E9 */
+    --info-foreground: 0 0% 100%;
+
+    --text-primary: 210 40% 96%;
+    --text-secondary: 215 16% 75%;
+    --text-muted: 215 16% 58%;
+
+    --border: 214 23% 18%;              /* #232C38 refined dark borders */
+    --input: 214 23% 18%;               /* #232C38 */
     --ring: 221 83% 58%;
 
-    --sidebar-background: 222 47% 8%;
+    --sidebar-background: 216 31% 10%;  /* #111720 primary surface */
     --sidebar-foreground: 210 40% 92%;
     --sidebar-primary: 221 83% 58%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 217 33% 18%;
+    --sidebar-accent: 215 28% 14%;
     --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 217 33% 20%;
+    --sidebar-border: 214 23% 18%;      /* #232C38 */
     --sidebar-ring: 221 83% 58%;
 
-    --gradient-primary: linear-gradient(135deg, hsl(221 83% 58%) 0%, hsl(250 83% 65%) 100%);
-    --gradient-hero: linear-gradient(135deg, hsl(221 83% 58% / 0.15) 0%, hsl(250 83% 65% / 0.08) 100%);
-    --gradient-card: linear-gradient(180deg, hsl(222 47% 10%) 0%, hsl(222 47% 8%) 100%);
-
-    --shadow-glow: 0 0 40px hsl(221 83% 58% / 0.2);
-    --shadow-card: 0 1px 3px hsl(0 0% 0% / 0.2), 0 1px 2px hsl(0 0% 0% / 0.3);
+    --shadow-xs: 0 1px 2px 0 hsl(0 0% 0% / 0.4);
+    --shadow-sm: 0 1px 3px 0 hsl(0 0% 0% / 0.4), 0 1px 2px -1px hsl(0 0% 0% / 0.3);
+    --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.4), 0 2px 4px -2px hsl(0 0% 0% / 0.3);
+    --shadow-lg: 0 10px 15px -3px hsl(0 0% 0% / 0.4), 0 4px 6px -4px hsl(0 0% 0% / 0.3);
+    --shadow-card: 0 1px 3px 0 hsl(0 0% 0% / 0.3);
   }
 }
 
@@ -206,6 +221,27 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+  }
+
+  /* Finora OS Typography Hierarchy */
+  .page-title {
+    @apply text-2xl sm:text-[28px] font-semibold tracking-tight text-foreground leading-tight;
+  }
+
+  .section-title {
+    @apply text-lg sm:text-[19px] font-semibold tracking-tight text-foreground;
+  }
+
+  .card-title-refined {
+    @apply text-[15px] font-semibold tracking-tight text-foreground;
+  }
+
+  .text-secondary-label {
+    @apply text-xs font-medium text-muted-foreground;
+  }
+
+  .metric-value {
+    @apply text-2xl sm:text-3xl font-semibold tracking-tight tabular-nums text-foreground;
   }
 }
 

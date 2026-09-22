@@ -38,40 +38,46 @@ export function UpcomingRecurringWidget() {
   };
 
   return (
-    <Card className="shadow-card">
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle className="text-lg font-semibold flex items-center gap-2">
-          <RefreshCw className="w-5 h-5 text-primary" />
-          Upcoming Recurring
-        </CardTitle>
-        <Button variant="ghost" size="sm" onClick={() => navigate('/recurring')} className="gap-1">
-          View all <ArrowUpRight className="w-4 h-4" />
+    <Card className="shadow-card border-border/80 bg-card">
+      <CardHeader className="flex flex-row items-center justify-between pb-3">
+        <div>
+          <CardTitle className="text-sm font-semibold flex items-center gap-2 text-foreground">
+            <RefreshCw className="w-4 h-4 text-primary" />
+            Upcoming Recurring
+          </CardTitle>
+          <p className="text-xs text-muted-foreground mt-0.5">Automated billing schedules next in line</p>
+        </div>
+        <Button variant="ghost" size="sm" onClick={() => navigate('/recurring')} className="gap-1 h-8 text-xs text-muted-foreground hover:text-foreground">
+          View all <ArrowUpRight className="w-3.5 h-3.5" />
         </Button>
       </CardHeader>
       <CardContent>
-        <div className="space-y-3">
+        <div className="space-y-2.5">
           {upcoming.length === 0 ? (
-            <p className="text-sm text-muted-foreground text-center py-8">No recurring invoices scheduled</p>
+            <div className="text-center py-8">
+              <Calendar className="w-8 h-8 text-muted-foreground/40 mx-auto mb-2" />
+              <p className="text-xs text-muted-foreground">No recurring invoice schedules active</p>
+            </div>
           ) : (
             upcoming.map(item => (
               <div
                 key={item.id}
-                className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
+                className="flex items-center justify-between p-3 rounded-lg border border-border/50 bg-muted/20 hover:bg-muted/40 transition-colors"
               >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                    <Calendar className="w-5 h-5 text-primary" />
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-8 h-8 rounded-md bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                    <Calendar className="w-4 h-4" />
                   </div>
-                  <div>
-                    <p className="font-medium text-sm">{item.client?.name || 'Unknown'}</p>
-                    <p className="text-xs text-muted-foreground capitalize">{item.frequency}</p>
+                  <div className="min-w-0">
+                    <p className="font-semibold text-xs text-foreground truncate">{item.client?.name || 'Unknown Client'}</p>
+                    <p className="text-[11px] text-muted-foreground capitalize">{item.frequency}</p>
                   </div>
                 </div>
-                <div className="text-right">
-                  <p className="font-semibold text-sm">{formatCurrency(item.total)}</p>
-                  <Badge variant="outline" className="text-xs">
+                <div className="text-right shrink-0">
+                  <p className="font-bold text-xs text-foreground">{formatCurrency(item.total)}</p>
+                  <span className="inline-block text-[10px] text-muted-foreground font-medium mt-0.5">
                     {getDaysUntil(item.nextGenerationDate)}
-                  </Badge>
+                  </span>
                 </div>
               </div>
             ))

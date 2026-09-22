@@ -325,8 +325,8 @@ export default function Products() {
         
         {/* Page Header */}
         <PageHeader
-          title="Products & Services Catalog"
-          description="Maintain items you invoice clients for, with automatic HSN, units, and tax pre-fills."
+          title="Products & Services"
+          description="Standardized price book, unit rates, tax codes, and service deliverables"
           action={
             <div className="flex flex-wrap items-center gap-2">
               <input
@@ -346,7 +346,7 @@ export default function Products() {
               </Button>
               <Button onClick={() => handleOpenDialog()} className="gap-2 text-xs h-9">
                 <Plus className="w-4 h-4" />
-                Add Item / Service
+                Add Product / Service
               </Button>
             </div>
           }

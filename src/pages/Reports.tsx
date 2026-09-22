@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useStore } from '@/store/useStore';
+import { PageHeader } from '@/components/ui/page-header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -440,37 +441,34 @@ export default function Reports() {
   };
 
   return (
-    <div className="container mx-auto p-6 space-y-6 max-w-7xl print:bg-white print:p-0">
+    <div className="space-y-6 animate-slide-up pb-10 print:bg-white print:p-0">
       {/* Page Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-border pb-5 print:hidden">
-        <div>
-          <h1 className="text-3xl font-semibold tracking-tight text-foreground flex items-center gap-2">
-            <BarChart3 className="w-8 h-8 text-primary" />
-            Reports & Analytics Center
-          </h1>
-          <p className="text-muted-foreground text-sm">
-            Full-spectrum business intelligence. View analytical dashboards, GST tax liability ledgers, and cash flow projections.
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Select value={period} onValueChange={(val: any) => setPeriod(val)}>
-            <SelectTrigger className="w-[160px] bg-card border-border">
-              <Calendar className="w-4 h-4 mr-1.5 opacity-60" />
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="30_days">Last 30 Days</SelectItem>
-              <SelectItem value="90_days">Last 90 Days</SelectItem>
-              <SelectItem value="this_year">This Fiscal Year</SelectItem>
-              <SelectItem value="last_year">Last Fiscal Year</SelectItem>
-            </SelectContent>
-          </Select>
+      <div className="print:hidden">
+        <PageHeader
+          title="Reports & Analytics"
+          description="Cash flow velocity, revenue ledgers, tax exposure, and forward projections"
+          action={
+            <div className="flex items-center gap-2">
+              <Select value={period} onValueChange={(val: any) => setPeriod(val)}>
+                <SelectTrigger className="w-[160px] bg-card border-border">
+                  <Calendar className="w-4 h-4 mr-1.5 opacity-60" />
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="30_days">Last 30 Days</SelectItem>
+                  <SelectItem value="90_days">Last 90 Days</SelectItem>
+                  <SelectItem value="this_year">This Fiscal Year</SelectItem>
+                  <SelectItem value="last_year">Last Fiscal Year</SelectItem>
+                </SelectContent>
+              </Select>
 
-          <Button variant="outline" size="sm" onClick={handlePrint} className="h-9">
-            <Printer className="w-4 h-4 mr-1.5" />
-            Print Report
-          </Button>
-        </div>
+              <Button variant="outline" size="sm" onClick={handlePrint} className="h-9">
+                <Printer className="w-4 h-4 mr-1.5" />
+                Print Report
+              </Button>
+            </div>
+          }
+        />
       </div>
 
       <Tabs defaultValue="analytics" className="space-y-6">

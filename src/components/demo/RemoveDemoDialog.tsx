@@ -198,12 +198,12 @@ export function RemoveDemoDialog({ isOpen, onClose, orgId }: RemoveDemoDialogPro
             </div>
             
             <div className="space-y-1.5 max-w-[280px]">
-              <h4 className="text-base font-semibold text-foreground">
+              <DialogTitle className="text-base font-semibold text-foreground">
                 Purging Demo Data
-              </h4>
-              <p className="text-xs text-muted-foreground font-mono animate-pulse min-h-[16px]">
+              </DialogTitle>
+              <DialogDescription className="text-xs text-muted-foreground font-mono animate-pulse min-h-[16px]">
                 {progressMsg}
-              </p>
+              </DialogDescription>
             </div>
           </div>
         )}
@@ -216,12 +216,12 @@ export function RemoveDemoDialog({ isOpen, onClose, orgId }: RemoveDemoDialogPro
               </div>
               
               <div className="space-y-2">
-                <h3 className="text-lg font-bold text-foreground">
+                <DialogTitle className="text-lg font-bold text-foreground">
                   Demo data removed successfully.
-                </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed max-w-[320px]">
+                </DialogTitle>
+                <DialogDescription className="text-sm text-muted-foreground leading-relaxed max-w-[320px]">
                   The workspace is now clean.
-                </p>
+                </DialogDescription>
               </div>
             </div>
 
@@ -245,12 +245,12 @@ export function RemoveDemoDialog({ isOpen, onClose, orgId }: RemoveDemoDialogPro
               </div>
               
               <div className="space-y-2">
-                <h3 className="text-lg font-bold text-foreground">
+                <DialogTitle className="text-lg font-bold text-foreground">
                   Purge Failed
-                </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed max-w-[320px]">
+                </DialogTitle>
+                <DialogDescription className="text-sm text-muted-foreground leading-relaxed max-w-[320px]">
                   {errorMsg}
-                </p>
+                </DialogDescription>
               </div>
             </div>
 

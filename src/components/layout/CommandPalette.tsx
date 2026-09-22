@@ -21,6 +21,8 @@ import { useStore } from '@/store/useStore';
 import {
   Dialog,
   DialogContent,
+  DialogTitle,
+  DialogDescription,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -34,7 +36,7 @@ export default function CommandPalette() {
 
   const { invoices = [], clients = [], products = [], settings, toggleTheme } = useStore();
 
-  // Listen for Ctrl+K / Cmd+K
+  // Listen for Ctrl+K / Cmd+K and custom event
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
@@ -42,8 +44,14 @@ export default function CommandPalette() {
         setIsOpen((prev) => !prev);
       }
     };
+    const handleCustomOpen = () => setIsOpen(true);
+
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener('open-command-palette', handleCustomOpen);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('open-command-palette', handleCustomOpen);
+    };
   }, []);
 
   // Reset selected index when query changes
@@ -234,6 +242,10 @@ export default function CommandPalette() {
       {/* Search keyboard prompt in header could listen here */}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent className="p-0 max-w-2xl border bg-card shadow-2xl overflow-hidden rounded-xl">
+          <DialogTitle className="sr-only">Command Palette</DialogTitle>
+          <DialogDescription className="sr-only">
+            Search for invoices, clients, actions, and navigate quickly across Finora OS.
+          </DialogDescription>
           
           {/* Header Search Field */}
           <div className="flex items-center border-b px-4 py-3 bg-muted/10">

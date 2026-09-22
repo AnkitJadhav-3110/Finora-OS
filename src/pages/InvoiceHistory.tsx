@@ -1,6 +1,6 @@
 import { Helmet } from 'react-helmet-async';
 import { useState, useMemo, useEffect, useCallback } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { useDataSync } from '@/hooks/useDataSync';
 import {
   Search,
@@ -25,6 +25,7 @@ import {
   CheckSquare,
   X,
   Link2,
+  Eye,
 } from 'lucide-react';
 import { useStore, Invoice } from '@/store/useStore';
 import { useAuthGuard } from '@/hooks/useAuthGuard';
@@ -72,6 +73,7 @@ import { downloadInvoicePDF } from '@/utils/pdfGenerator';
 import { exportInvoicesToCSV } from '@/utils/csvExport';
 import { sendInvoiceWithPDF } from '@/utils/emailService';
 import { InvoiceTimeline } from '@/components/invoice/InvoiceTimeline';
+import { InvoiceDetailModal } from '@/components/invoice/InvoiceDetailModal';
 import { createClientPortalLink } from '@/utils/clientPortal';
 import { useAuth } from '@/contexts/AuthContext';
 import {
@@ -84,15 +86,18 @@ import {
 
 export default function InvoiceHistory() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const isPaymentsView = searchParams.get('view') === 'payments';
   const { invoices, clients, businesses, settings } = useStore();
   const { duplicateInvoice, deleteInvoice, updateInvoice } = useDataSync();
   const { ensureAuth, ensureOwnsInvoice } = useAuthGuard();
   const { user } = useAuth();
   const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [statusFilter, setStatusFilter] = useState<string>(isPaymentsView ? 'paid' : 'all');
   const [clientFilter, setClientFilter] = useState<string>('all');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
+  const [detailInvoice, setDetailInvoice] = useState<Invoice | null>(null);
   const [timelineInvoice, setTimelineInvoice] = useState<Invoice | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -303,8 +308,8 @@ export default function InvoiceHistory() {
       </Helmet>
       <div className="space-y-6 animate-slide-up">
       <PageHeader
-        title="Invoice History"
-        description="View and manage all your invoices"
+        title={isPaymentsView ? "Payments & Collections" : "Invoices"}
+        description={isPaymentsView ? "Real-time ledger of settled client invoices and collected receivables" : "Comprehensive financial invoice ledger, billing cycles, and client dispatch"}
         action={
           <div className="flex flex-col sm:flex-row gap-2">
             <Button variant="outline" onClick={handleExportCSV} className="gap-2">
@@ -432,7 +437,7 @@ export default function InvoiceHistory() {
                   const isSelected = selectedIds.has(invoice.id);
 
                   return (
-                    <TableRow key={invoice.id} className={`hover:bg-muted/30 cursor-pointer ${isSelected ? 'bg-primary/5' : ''}`} onClick={() => setTimelineInvoice(invoice)}>
+                    <TableRow key={invoice.id} className={`hover:bg-muted/30 cursor-pointer ${isSelected ? 'bg-primary/5' : ''}`} onClick={() => setDetailInvoice(invoice)}>
                       <TableCell onClick={(e) => e.stopPropagation()}>
                         <Checkbox checked={isSelected} onCheckedChange={() => toggleSelect(invoice.id)} aria-label={`Select ${invoice.invoiceNumber}`} />
                       </TableCell>
@@ -442,7 +447,7 @@ export default function InvoiceHistory() {
                             <FileText className="w-5 h-5 text-primary" />
                           </div>
                           <div className="min-w-0">
-                            <p className="font-medium truncate">{invoice.invoiceNumber}</p>
+                            <p className="font-medium truncate hover:text-primary transition-colors">{invoice.invoiceNumber}</p>
                             <p className="text-xs text-muted-foreground capitalize sm:hidden truncate">{client?.name || 'Unknown'}</p>
                           </div>
                         </div>
@@ -466,6 +471,9 @@ export default function InvoiceHistory() {
                             <Button variant="ghost" size="icon"><MoreHorizontal className="w-4 h-4" /></Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); setDetailInvoice(invoice); }}>
+                              <Eye className="w-4 h-4 mr-2" />View Details
+                            </DropdownMenuItem>
                             <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleEdit(invoice.id); }}>
                               <Pencil className="w-4 h-4 mr-2" />Edit Invoice
                             </DropdownMenuItem>
@@ -573,6 +581,21 @@ export default function InvoiceHistory() {
           )}
         </DialogContent>
       </Dialog>
+
+      <InvoiceDetailModal
+        invoice={detailInvoice}
+        isOpen={!!detailInvoice}
+        onClose={() => setDetailInvoice(null)}
+        client={clients.find(c => c.id === detailInvoice?.clientId)}
+        business={businesses.find(b => b.id === detailInvoice?.businessId)}
+        settings={settings}
+        onDownload={handleDownload}
+        onEdit={handleEdit}
+        onDuplicate={handleDuplicate}
+        onSendEmail={handleSendEmail}
+        onShareLink={handleShareWithClient}
+        onMarkPaid={handleMarkPaid}
+      />
     </div>
     </>
   );

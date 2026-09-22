@@ -87,30 +87,36 @@ export function RecentActivityWidget() {
   };
 
   return (
-    <Card className="shadow-card">
-      <CardHeader>
-        <CardTitle className="text-lg font-semibold flex items-center gap-2">
-          <Activity className="w-5 h-5 text-primary" />
-          Recent Activity
-        </CardTitle>
+    <Card className="shadow-card border-border/80 bg-card">
+      <CardHeader className="flex flex-row items-center justify-between pb-3">
+        <div>
+          <CardTitle className="text-sm font-semibold flex items-center gap-2 text-foreground">
+            <Activity className="w-4 h-4 text-primary" />
+            Recent Financial Activity
+          </CardTitle>
+          <p className="text-xs text-muted-foreground mt-0.5">Audit log of invoicing and collection events</p>
+        </div>
       </CardHeader>
       <CardContent>
-        <div className="space-y-3">
+        <div className="space-y-2.5">
           {activities.length === 0 ? (
-            <p className="text-sm text-muted-foreground text-center py-8">No recent activity</p>
+            <div className="text-center py-8">
+              <Activity className="w-8 h-8 text-muted-foreground/40 mx-auto mb-2" />
+              <p className="text-xs text-muted-foreground">No recent financial activity</p>
+            </div>
           ) : (
             activities.map(item => {
               const Icon = item.icon;
               return (
-                <div key={item.id} className="flex items-start gap-3">
-                  <div className={`p-2 rounded-lg flex-shrink-0 ${item.color}`}>
-                    <Icon className="w-4 h-4" />
+                <div key={item.id} className="flex items-center gap-3 p-2.5 rounded-lg border border-border/40 bg-muted/20 hover:bg-muted/40 transition-colors">
+                  <div className={`p-2 rounded-md flex-shrink-0 ${item.color}`}>
+                    <Icon className="w-3.5 h-3.5" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-foreground">{item.label}</p>
-                    <p className="text-xs text-muted-foreground truncate">{item.detail}</p>
+                    <p className="text-xs font-semibold text-foreground">{item.label}</p>
+                    <p className="text-[11px] text-muted-foreground truncate">{item.detail}</p>
                   </div>
-                  <span className="text-xs text-muted-foreground flex-shrink-0">{timeAgo(item.time)}</span>
+                  <span className="text-[10px] text-muted-foreground/80 font-mono flex-shrink-0">{timeAgo(item.time)}</span>
                 </div>
               );
             })

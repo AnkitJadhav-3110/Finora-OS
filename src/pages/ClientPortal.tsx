@@ -39,6 +39,8 @@ import { BrandWordmark } from '@/components/BrandWordmark';
 import {
   Dialog,
   DialogContent,
+  DialogTitle,
+  DialogDescription,
 } from '@/components/ui/dialog';
 
 export default function ClientPortal() {
@@ -499,6 +501,10 @@ export default function ClientPortal() {
       {/* ─── RAZORPAY CHECKOUT SANDBOX MODAL ─── */}
       <Dialog open={isRazorpayOpen} onOpenChange={(open) => { if (!paying) setIsRazorpayOpen(open); }}>
         <DialogContent className="sm:max-w-[420px] p-0 overflow-hidden bg-white rounded-2xl shadow-2xl border-0">
+          <DialogTitle className="sr-only">Razorpay Checkout Sandbox</DialogTitle>
+          <DialogDescription className="sr-only">
+            Complete payment simulation using Razorpay sandbox checkout.
+          </DialogDescription>
           
           {/* Razorpay Banner & Header */}
           <div className="bg-[#101726] text-white p-6 relative">

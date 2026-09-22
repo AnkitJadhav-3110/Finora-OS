@@ -630,8 +630,8 @@ export default function Clients() {
         
         {/* Page Header */}
         <PageHeader
-          title="Clients Directory"
-          description="Manage client directory, track invoice collections, and log tax information."
+          title="Clients"
+          description="Customer directory, credit balances, payment histories, and billing terms"
           action={
             <div className="flex flex-wrap items-center gap-2">
               <input

@@ -65,16 +65,18 @@ export function BrandWordmark({
       <span className={cn('flex flex-col', align === 'center' && 'items-center')}>
         <span
           className={cn(
-            'font-extrabold tracking-tight leading-none text-foreground select-none',
+            'font-bold tracking-tight leading-none text-foreground select-none flex items-center gap-1',
             preset.text,
           )}
         >
-          <span className="bg-clip-text text-transparent bg-gradient-to-r from-foreground via-foreground to-foreground/80">Fin</span>
-          <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary via-indigo-500 to-purple-600 font-bold">ora</span>
+          <span>Finora</span>
+          <span className="text-[10px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">
+            OS
+          </span>
         </span>
         {withTagline && (
-          <span className={cn('text-muted-foreground leading-none mt-1.5 font-medium tracking-wide uppercase', preset.tagline)}>
-            The Financial OS
+          <span className={cn('text-muted-foreground leading-none mt-1 font-medium tracking-wider uppercase text-[10px]')}>
+            Financial Operating System
           </span>
         )}
       </span>

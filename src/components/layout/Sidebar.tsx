@@ -1,24 +1,23 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import {
   LayoutDashboard,
-  PlusCircle,
   FileText,
-  RefreshCw,
   Users,
   Package,
-  Building2,
+  RefreshCw,
   Receipt,
+  CreditCard,
   BarChart3,
   Files,
   PenTool,
-  Mail,
+  Building2,
   Briefcase,
-  CreditCard,
+  Sparkles,
   ShieldCheck,
   Settings,
+  HelpCircle,
   ChevronLeft,
   ChevronRight,
   Plus,
@@ -28,96 +27,78 @@ import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { AppLogo } from '@/components/AppLogo';
 import { BrandWordmark } from '@/components/BrandWordmark';
+import { HelpSupportModal } from './HelpSupportModal';
 
 export interface NavItem {
   id: string;
   label: string;
   path: string;
   icon: React.ComponentType<{ className?: string }>;
-  isPrimaryAction?: boolean;
+  badge?: string;
 }
 
 export interface NavGroup {
   id: string;
   title: string;
-  collapsible?: boolean;
   items: NavItem[];
 }
 
 /**
- * Standard Information Architecture for Finora OS
- * Strict 2-level hierarchy: Category -> Module Link
+ * Finora OS - Category-Based Information Architecture
+ * Phase 1 Redesign Specification
  */
 const NAVIGATION_GROUPS: NavGroup[] = [
   {
     id: 'overview',
     title: 'Overview',
-    collapsible: false,
     items: [
       { id: 'dashboard', label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
     ],
   },
   {
-    id: 'invoicing',
-    title: 'Invoicing',
-    collapsible: true,
+    id: 'sales',
+    title: 'Sales',
     items: [
-      { id: 'create-invoice', label: 'Create Invoice', path: '/invoices/create', icon: PlusCircle, isPrimaryAction: true },
-      { id: 'invoice-history', label: 'Invoice History', path: '/invoices/history', icon: FileText },
-      { id: 'recurring', label: 'Recurring', path: '/recurring', icon: RefreshCw },
-    ],
-  },
-  {
-    id: 'business',
-    title: 'Business',
-    collapsible: true,
-    items: [
+      { id: 'invoices', label: 'Invoices', path: '/invoices/history', icon: FileText },
       { id: 'clients', label: 'Clients', path: '/clients', icon: Users },
       { id: 'products', label: 'Products & Services', path: '/products', icon: Package },
-      { id: 'business-profile', label: 'Business', path: '/business', icon: Building2 },
+      { id: 'recurring', label: 'Recurring', path: '/recurring', icon: RefreshCw },
     ],
   },
   {
     id: 'finance',
     title: 'Finance',
-    collapsible: true,
     items: [
       { id: 'expenses', label: 'Expenses', path: '/expenses', icon: Receipt },
-      { id: 'reports', label: 'Reports & Analytics', path: '/reports', icon: BarChart3 },
+      { id: 'payments', label: 'Payments', path: '/invoices/history?view=payments', icon: CreditCard },
+      { id: 'reports', label: 'Reports', path: '/reports', icon: BarChart3 },
     ],
   },
   {
     id: 'workspace',
     title: 'Workspace',
-    collapsible: true,
     items: [
-      { id: 'documents', label: 'Document Center', path: '/documents', icon: Files },
-      { id: 'templates', label: 'Template Editor', path: '/templates', icon: PenTool },
-      { id: 'email-branding', label: 'Email Branding', path: '/settings?tab=emails', icon: Mail },
+      { id: 'documents', label: 'Documents', path: '/documents', icon: Files },
+      { id: 'templates', label: 'Templates', path: '/templates', icon: PenTool },
+      { id: 'business', label: 'Business', path: '/business', icon: Building2 },
+    ],
+  },
+  {
+    id: 'automation',
+    title: 'Automation',
+    items: [
       { id: 'tools', label: 'Business Tools', path: '/tools', icon: Briefcase },
     ],
   },
   {
-    id: 'growth',
-    title: 'Growth',
-    collapsible: true,
+    id: 'platform',
+    title: 'Platform',
     items: [
-      { id: 'saas-billing', label: 'SaaS Billing', path: '/settings?tab=subscription', icon: CreditCard },
-      { id: 'enterprise', label: 'Enterprise Hub', path: '/enterprise', icon: ShieldCheck },
-    ],
-  },
-  {
-    id: 'settings',
-    title: 'Settings',
-    collapsible: false,
-    items: [
-      { id: 'settings', label: 'Settings', path: '/settings', icon: Settings },
+      { id: 'billing', label: 'Billing & Plans', path: '/settings?tab=subscription', icon: Sparkles },
+      { id: 'enterprise', label: 'Enterprise', path: '/enterprise', icon: ShieldCheck },
     ],
   },
 ];
-
-const ALL_COLLAPSIBLE_GROUP_IDS = NAVIGATION_GROUPS.filter(g => g.collapsible).map(g => g.id);
-const STORAGE_KEY = 'finora_sidebar_expanded_groups_v2';
 
 interface SidebarProps {
   collapsed: boolean;
@@ -128,6 +109,7 @@ interface SidebarProps {
 
 export function Sidebar({ collapsed, onToggle, isMobileOpen, onMobileClose }: SidebarProps) {
   const navigate = useNavigate();
+  const [helpOpen, setHelpOpen] = useState(false);
 
   const handleLogoClick = () => {
     navigate('/dashboard');
@@ -142,8 +124,8 @@ export function Sidebar({ collapsed, onToggle, isMobileOpen, onMobileClose }: Si
     <>
       {/* Mobile Drawer Overlay */}
       {isMobileOpen && (
-        <div 
-          className="fixed inset-0 bg-black/60 backdrop-blur-xs z-40 lg:hidden animate-fade-in"
+        <div
+          className="fixed inset-0 bg-background/80 backdrop-blur-sm z-40 lg:hidden animate-fade-in"
           onClick={onMobileClose}
           aria-hidden="true"
         />
@@ -154,17 +136,18 @@ export function Sidebar({ collapsed, onToggle, isMobileOpen, onMobileClose }: Si
         id="finora-desktop-sidebar"
         className={cn(
           "fixed left-0 top-0 z-50 h-screen flex flex-col",
-          "bg-card border-r border-border shadow-xs",
+          "bg-surface border-r border-border shadow-xs",
           "transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]",
-          "hidden lg:flex",
+          "hidden lg:flex select-none",
           collapsed ? "lg:w-[68px]" : "lg:w-64"
         )}
       >
-        <SidebarContent 
-          collapsed={collapsed} 
-          onToggle={onToggle} 
+        <SidebarInner
+          collapsed={collapsed}
+          onToggle={onToggle}
           onLogoClick={handleLogoClick}
           onNavClick={handleNavClick}
+          onOpenHelp={() => setHelpOpen(true)}
           showToggle
         />
       </aside>
@@ -175,138 +158,97 @@ export function Sidebar({ collapsed, onToggle, isMobileOpen, onMobileClose }: Si
         aria-label="Mobile Navigation"
         className={cn(
           "fixed left-0 top-0 z-50 h-screen w-72 flex flex-col",
-          "bg-card border-r border-border shadow-2xl",
-          "transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] lg:hidden",
+          "bg-surface border-r border-border shadow-2xl",
+          "transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] lg:hidden select-none",
           isMobileOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
-        <SidebarContent 
-          collapsed={false} 
-          onToggle={onToggle} 
+        <SidebarInner
+          collapsed={false}
+          onToggle={onToggle}
           onLogoClick={handleLogoClick}
           onNavClick={handleNavClick}
+          onOpenHelp={() => setHelpOpen(true)}
           showMobileClose
           onMobileClose={onMobileClose}
         />
       </aside>
+
+      {/* Central Help & Support Dialog */}
+      <HelpSupportModal isOpen={helpOpen} onClose={() => setHelpOpen(false)} />
     </>
   );
 }
 
-interface SidebarContentProps {
+interface SidebarInnerProps {
   collapsed: boolean;
   onToggle: () => void;
   onLogoClick: () => void;
   onNavClick: () => void;
+  onOpenHelp: () => void;
   showToggle?: boolean;
   showMobileClose?: boolean;
   onMobileClose?: () => void;
 }
 
-function SidebarContent({ 
-  collapsed, 
-  onToggle, 
-  onLogoClick, 
+function SidebarInner({
+  collapsed,
+  onToggle,
+  onLogoClick,
   onNavClick,
+  onOpenHelp,
   showToggle,
   showMobileClose,
-  onMobileClose 
-}: SidebarContentProps) {
+  onMobileClose,
+}: SidebarInnerProps) {
   const location = useLocation();
 
-  // Route matching helper
-  const isItemActive = useCallback((itemPath: string) => {
-    if (itemPath.includes('?')) {
-      return (location.pathname + location.search) === itemPath;
-    }
-    if (itemPath === '/settings') {
-      return location.pathname === '/settings' && 
-        !location.search.includes('tab=emails') && 
-        !location.search.includes('tab=subscription');
-    }
-    return location.pathname === itemPath;
-  }, [location.pathname, location.search]);
+  // Route matching logic
+  const isItemActive = useCallback(
+    (itemPath: string) => {
+      const currentUrl = location.pathname + location.search;
 
-  // Find active group ID based on current route
-  const activeGroupId = useMemo(() => {
-    for (const group of NAVIGATION_GROUPS) {
-      for (const item of group.items) {
-        if (isItemActive(item.path)) {
-          return group.id;
-        }
+      if (itemPath.includes('?')) {
+        return currentUrl === itemPath;
       }
-    }
-    return null;
-  }, [isItemActive]);
 
-  // Persisted state of expanded groups
-  const [expandedGroups, setExpandedGroups] = useState<string[]>(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) return parsed;
+      if (itemPath === '/invoices/history') {
+        return (
+          location.pathname === '/invoices/history' &&
+          !location.search.includes('view=payments')
+        );
       }
-    } catch {
-      // Fallback
-    }
-    // Default to having all collapsible categories open for high discoverability
-    return ALL_COLLAPSIBLE_GROUP_IDS;
-  });
 
-  // Auto-expand the category of the currently active route
-  useEffect(() => {
-    if (activeGroupId && NAVIGATION_GROUPS.find(g => g.id === activeGroupId)?.collapsible) {
-      setExpandedGroups(prev => {
-        if (!prev.includes(activeGroupId)) {
-          const updated = [...prev, activeGroupId];
-          try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-          } catch {
-            // Ignore
-          }
-          return updated;
-        }
-        return prev;
-      });
-    }
-  }, [activeGroupId]);
-
-  // Toggle single category
-  const toggleGroup = (groupId: string) => {
-    setExpandedGroups(prev => {
-      const next = prev.includes(groupId) 
-        ? prev.filter(id => id !== groupId) 
-        : [...prev, groupId];
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-      } catch {
-        // Ignore
+      if (itemPath === '/settings') {
+        return (
+          location.pathname === '/settings' &&
+          !location.search.includes('tab=subscription') &&
+          !location.search.includes('tab=emails')
+        );
       }
-      return next;
-    });
-  };
+
+      return location.pathname === itemPath;
+    },
+    [location.pathname, location.search]
+  );
 
   return (
     <>
       {/* Brand Header */}
-      <div 
+      <div
         className={cn(
-          "h-16 flex items-center border-b border-border/80 px-3.5 flex-shrink-0",
+          "h-16 flex items-center border-b border-border/80 px-4 flex-shrink-0",
           collapsed ? "justify-center px-2" : "justify-between"
         )}
       >
-        <button 
+        <button
           onClick={onLogoClick}
-          className={cn(
-            "transition-all duration-200 cursor-pointer",
-            "hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-lg",
-          )}
-          aria-label="Finora OS Home"
+          className="transition-all duration-150 cursor-pointer hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-lg text-left"
+          aria-label="Finora OS Dashboard"
         >
           {collapsed ? (
-            <div className="w-10 h-10 rounded-xl bg-card border border-border/80 flex items-center justify-center shadow-xs flex-shrink-0 overflow-hidden">
-              <AppLogo className="w-8 h-8" />
+            <div className="w-9 h-9 rounded-lg bg-surface border border-border flex items-center justify-center shadow-xs flex-shrink-0">
+              <AppLogo className="w-6 h-6" />
             </div>
           ) : (
             <BrandWordmark withLogo withTagline size="md" />
@@ -318,42 +260,48 @@ function SidebarContent({
             variant="ghost"
             size="icon"
             onClick={onMobileClose}
-            className="text-muted-foreground hover:text-foreground hover:bg-accent/60 h-8 w-8 rounded-lg"
-            aria-label="Close navigation menu"
+            className="text-muted-foreground hover:text-foreground h-8 w-8 rounded-lg"
+            aria-label="Close navigation drawer"
           >
             <X className="w-4 h-4" />
           </Button>
         )}
       </div>
 
-      {/* Primary Action Button: "Create Invoice" */}
-      <div className={cn("px-3 pt-3 pb-1.5 flex-shrink-0", collapsed && "px-2 pt-2.5")}>
+      {/* Quick Action: Create Invoice */}
+      <div className={cn("px-3 pt-3 pb-1 flex-shrink-0", collapsed && "px-2 pt-2.5")}>
         <Tooltip delayDuration={0}>
           <TooltipTrigger asChild>
             <Link
               to="/invoices/create"
               onClick={onNavClick}
               className={cn(
-                "group relative flex items-center rounded-lg transition-all duration-150 ease-in-out select-none",
-                "bg-primary text-primary-foreground hover:bg-primary/90 active:scale-[0.98]",
-                "shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
+                "group relative flex items-center rounded-lg transition-all duration-150 ease-in-out select-none font-medium",
+                location.pathname === '/invoices/create'
+                  ? "bg-primary text-primary-foreground shadow-xs ring-2 ring-primary/30"
+                  : "bg-primary text-primary-foreground hover:bg-primary/90 shadow-xs",
                 collapsed
                   ? "w-10 h-10 mx-auto justify-center"
-                  : "w-full px-3 py-2 justify-center gap-2 font-semibold text-xs tracking-wide"
+                  : "w-full px-3 py-2 justify-center gap-2 text-xs"
               )}
               aria-label="Create New Invoice"
             >
-              <Plus className={cn("transition-transform duration-200 group-hover:rotate-90", collapsed ? "w-5 h-5" : "w-4 h-4")} />
+              <Plus
+                className={cn(
+                  "transition-transform duration-200 group-hover:rotate-90",
+                  collapsed ? "w-4 h-4" : "w-3.5 h-3.5"
+                )}
+              />
               {!collapsed && (
-                <span className="font-semibold text-[13px]">Create Invoice</span>
+                <span className="font-semibold text-[13px] tracking-tight">Create Invoice</span>
               )}
             </Link>
           </TooltipTrigger>
           {collapsed && (
-            <TooltipContent 
-              side="right" 
-              sideOffset={12} 
-              className="font-semibold bg-primary text-primary-foreground border-0 shadow-md"
+            <TooltipContent
+              side="right"
+              sideOffset={12}
+              className="font-medium bg-primary text-primary-foreground border-0 shadow-md text-xs py-1 px-2.5"
             >
               Create Invoice
             </TooltipContent>
@@ -361,234 +309,198 @@ function SidebarContent({
         </Tooltip>
       </div>
 
-      {/* Navigation Groups Container */}
-      <nav 
-        className="sidebar-scroll flex-1 py-2 px-2.5 overflow-y-auto space-y-3 focus:outline-none"
-        aria-label="Main Navigation"
+      {/* Category-Based Navigation List */}
+      <nav
+        className="sidebar-scroll flex-1 py-2 px-3 overflow-y-auto space-y-4 focus:outline-none"
+        aria-label="Main Navigation Categories"
       >
-        {NAVIGATION_GROUPS.map((group, groupIdx) => {
-          const isCollapsible = group.collapsible !== false;
-          const isExpanded = !isCollapsible || expandedGroups.includes(group.id);
-          const hasActiveChild = group.items.some(item => isItemActive(item.path));
-
+        {NAVIGATION_GROUPS.map((group) => {
           return (
             <div key={group.id} className="space-y-0.5">
-              {/* Collapsed Mode Separator */}
-              {collapsed ? (
-                groupIdx > 0 && <div className="h-px bg-border/50 my-2 mx-1.5" />
-              ) : (
-                /* Expanded Mode Category Header */
-                <div className="pt-1 pb-0.5">
-                  {isCollapsible ? (
-                    <button
-                      type="button"
-                      onClick={() => toggleGroup(group.id)}
-                      aria-expanded={isExpanded}
-                      aria-controls={`nav-group-${group.id}`}
-                      className={cn(
-                        "w-full flex items-center justify-between px-2 py-1 rounded-md",
-                        "text-[10.5px] font-semibold tracking-wider text-muted-foreground/70 uppercase select-none",
-                        "hover:text-foreground hover:bg-accent/40 transition-colors duration-150 cursor-pointer",
-                        "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary/40 group/header"
-                      )}
-                    >
-                      <div className="flex items-center gap-1.5 truncate">
-                        <span className="truncate">{group.title}</span>
-                        {/* Active dot indicator if section is collapsed but contains current route */}
-                        {!isExpanded && hasActiveChild && (
-                          <span 
-                            className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" 
-                            title="Active page inside"
-                          />
-                        )}
-                      </div>
-                      <ChevronRight 
-                        className={cn(
-                          "w-3 h-3 text-muted-foreground/50 transition-transform duration-200 group-hover/header:text-foreground",
-                          isExpanded && "rotate-90"
-                        )} 
-                        aria-hidden="true"
-                      />
-                    </button>
-                  ) : (
-                    <div className="px-2 py-0.5 text-[10px] font-semibold tracking-wider text-muted-foreground/50 uppercase select-none">
-                      {group.title}
-                    </div>
-                  )}
+              {/* Category Header */}
+              {!collapsed ? (
+                <div className="px-2 pt-1 pb-1 text-[10.5px] font-semibold tracking-wider text-muted-foreground/70 uppercase">
+                  {group.title}
                 </div>
+              ) : (
+                <div className="h-px bg-border/50 my-2 mx-1" />
               )}
 
-              {/* Group Items */}
-              {collapsed ? (
-                <div className="space-y-1">
-                  {group.items.map(item => (
-                    <CollapsedNavItem
+              {/* Category Items */}
+              <div className="space-y-0.5">
+                {group.items.map((item) => {
+                  const active = isItemActive(item.path);
+                  const Icon = item.icon;
+
+                  if (collapsed) {
+                    return (
+                      <Tooltip key={item.id} delayDuration={0}>
+                        <TooltipTrigger asChild>
+                          <Link
+                            to={item.path}
+                            onClick={onNavClick}
+                            className={cn(
+                              "flex items-center justify-center rounded-lg transition-all duration-150 select-none",
+                              "w-10 h-10 mx-auto no-underline group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
+                              active
+                                ? "bg-primary text-primary-foreground font-semibold shadow-xs"
+                                : "text-muted-foreground hover:text-foreground hover:bg-surface-hover/80"
+                            )}
+                            aria-label={`${item.label} (${group.title})`}
+                          >
+                            <Icon
+                              className={cn(
+                                "w-4 h-4 transition-transform duration-150 group-hover:scale-110",
+                                active ? "text-primary-foreground" : "text-muted-foreground group-hover:text-foreground"
+                              )}
+                              aria-hidden="true"
+                            />
+                          </Link>
+                        </TooltipTrigger>
+                        <TooltipContent
+                          side="right"
+                          sideOffset={12}
+                          className="flex items-center gap-2 bg-popover text-popover-foreground border border-border shadow-md py-1.5 px-2.5 text-xs"
+                        >
+                          <span className="font-medium">{item.label}</span>
+                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground uppercase font-mono tracking-wider">
+                            {group.title}
+                          </span>
+                        </TooltipContent>
+                      </Tooltip>
+                    );
+                  }
+
+                  return (
+                    <Link
                       key={item.id}
-                      item={item}
-                      groupTitle={group.title}
-                      isActive={isItemActive(item.path)}
-                      onNavClick={onNavClick}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <AnimatePresence initial={false}>
-                  {isExpanded && (
-                    <motion.div
-                      id={`nav-group-${group.id}`}
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: "auto", opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.16, ease: [0.4, 0, 0.2, 1] }}
-                      className="overflow-hidden space-y-0.5"
+                      to={item.path}
+                      onClick={onNavClick}
+                      className={cn(
+                        "flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 transition-all duration-150 group select-none",
+                        "font-medium text-[13px] no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40",
+                        active
+                          ? "bg-primary text-primary-foreground font-semibold shadow-xs"
+                          : "text-muted-foreground hover:text-foreground hover:bg-surface-hover/80 active:bg-surface-hover"
+                      )}
                     >
-                      {group.items.map(item => (
-                        <ExpandedNavItem
-                          key={item.id}
-                          item={item}
-                          isActive={isItemActive(item.path)}
-                          isSubmenu={isCollapsible}
-                          onNavClick={onNavClick}
+                      <Icon
+                        className={cn(
+                          "w-4 h-4 flex-shrink-0 transition-transform duration-150 group-hover:scale-105",
+                          active ? "text-primary-foreground" : "text-muted-foreground/80 group-hover:text-foreground"
+                        )}
+                        aria-hidden="true"
+                      />
+                      <span className="truncate">{item.label}</span>
+                      {active && (
+                        <span
+                          className="ml-auto w-1.5 h-1.5 rounded-full bg-primary-foreground/90 shrink-0"
+                          aria-hidden="true"
                         />
-                      ))}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              )}
+                      )}
+                    </Link>
+                  );
+                })}
+              </div>
             </div>
           );
         })}
       </nav>
 
-      {/* Collapse/Expand Footer Toggle (Desktop Only) */}
-      {showToggle && (
-        <div className="p-2.5 border-t border-border/70 flex-shrink-0 bg-card">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onToggle}
+      {/* Pinned Bottom Section: Settings & Help/Support */}
+      <div className="p-3 border-t border-border/80 flex-shrink-0 bg-surface/90 space-y-1">
+        {/* Settings */}
+        {collapsed ? (
+          <Tooltip delayDuration={0}>
+            <TooltipTrigger asChild>
+              <Link
+                to="/settings"
+                onClick={onNavClick}
+                className={cn(
+                  "flex items-center justify-center rounded-lg transition-all duration-150 w-10 h-10 mx-auto",
+                  isItemActive('/settings')
+                    ? "bg-primary text-primary-foreground font-semibold shadow-xs"
+                    : "text-muted-foreground hover:text-foreground hover:bg-surface-hover/80"
+                )}
+                aria-label="Settings"
+              >
+                <Settings className="w-4 h-4" />
+              </Link>
+            </TooltipTrigger>
+            <TooltipContent side="right" sideOffset={12} className="text-xs">
+              Settings
+            </TooltipContent>
+          </Tooltip>
+        ) : (
+          <Link
+            to="/settings"
+            onClick={onNavClick}
             className={cn(
-              "w-full flex items-center transition-colors duration-150 h-8 text-xs font-medium",
-              "text-muted-foreground hover:text-foreground hover:bg-accent/60",
-              collapsed ? "justify-center px-0" : "justify-start px-2 gap-2"
+              "flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 transition-all duration-150 font-medium text-[13px]",
+              isItemActive('/settings')
+                ? "bg-primary text-primary-foreground font-semibold shadow-xs"
+                : "text-muted-foreground hover:text-foreground hover:bg-surface-hover/80"
             )}
-            title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
-            {collapsed ? (
-              <ChevronRight className="w-4 h-4" />
-            ) : (
-              <>
-                <ChevronLeft className="w-4 h-4" />
-                <span>Collapse Sidebar</span>
-              </>
-            )}
-          </Button>
-        </div>
-      )}
+            <Settings className="w-4 h-4 shrink-0" />
+            <span className="truncate">Settings</span>
+          </Link>
+        )}
+
+        {/* Help & Support */}
+        {collapsed ? (
+          <Tooltip delayDuration={0}>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                onClick={onOpenHelp}
+                className="flex items-center justify-center rounded-lg transition-all duration-150 w-10 h-10 mx-auto text-muted-foreground hover:text-foreground hover:bg-surface-hover/80 cursor-pointer"
+                aria-label="Help & Support"
+              >
+                <HelpCircle className="w-4 h-4" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="right" sideOffset={12} className="text-xs">
+              Help & Support
+            </TooltipContent>
+          </Tooltip>
+        ) : (
+          <button
+            type="button"
+            onClick={onOpenHelp}
+            className="w-full flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 transition-all duration-150 font-medium text-[13px] text-muted-foreground hover:text-foreground hover:bg-surface-hover/80 cursor-pointer text-left"
+          >
+            <HelpCircle className="w-4 h-4 shrink-0" />
+            <span className="truncate">Help & Support</span>
+          </button>
+        )}
+
+        {/* Collapse / Expand Toggle Button (Desktop Only) */}
+        {showToggle && (
+          <div className="pt-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onToggle}
+              className={cn(
+                "w-full flex items-center transition-colors duration-150 h-8 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-surface-hover",
+                collapsed ? "justify-center px-0" : "justify-start px-2 gap-2"
+              )}
+              title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+              aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            >
+              {collapsed ? (
+                <ChevronRight className="w-4 h-4" />
+              ) : (
+                <>
+                  <ChevronLeft className="w-4 h-4" />
+                  <span>Collapse Sidebar</span>
+                </>
+              )}
+            </Button>
+          </div>
+        )}
+      </div>
     </>
-  );
-}
-
-/**
- * Single Nav Item for Expanded Sidebar (Level 2)
- */
-function ExpandedNavItem({
-  item,
-  isActive,
-  isSubmenu,
-  onNavClick,
-}: {
-  item: NavItem;
-  isActive: boolean;
-  isSubmenu: boolean;
-  onNavClick: () => void;
-}) {
-  const Icon = item.icon;
-
-  return (
-    <Link
-      to={item.path}
-      onClick={onNavClick}
-      className={cn(
-        "flex items-center gap-2.5 rounded-lg transition-all duration-150 group relative select-none",
-        "font-medium text-[13px] no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40",
-        isSubmenu ? "pl-3 pr-2.5 py-1.5" : "px-2.5 py-1.5",
-        isActive
-          ? "bg-primary text-primary-foreground font-semibold shadow-xs"
-          : "text-muted-foreground hover:text-foreground hover:bg-accent/60 active:bg-accent"
-      )}
-    >
-      <Icon 
-        className={cn(
-          "w-4 h-4 flex-shrink-0 transition-transform duration-150 ease-out group-hover:scale-105",
-          isActive ? "text-primary-foreground" : "text-muted-foreground/75 group-hover:text-foreground"
-        )} 
-        aria-hidden="true"
-      />
-      <span className="truncate">{item.label}</span>
-
-      {/* Subtle indicator pip for active nested item */}
-      {isActive && (
-        <span 
-          className="ml-auto w-1.5 h-1.5 rounded-full bg-primary-foreground/90 shrink-0" 
-          aria-hidden="true"
-        />
-      )}
-    </Link>
-  );
-}
-
-/**
- * Single Nav Item for Collapsed Sidebar (Icon-Only Mode with Tooltip)
- */
-function CollapsedNavItem({
-  item,
-  groupTitle,
-  isActive,
-  onNavClick,
-}: {
-  item: NavItem;
-  groupTitle: string;
-  isActive: boolean;
-  onNavClick: () => void;
-}) {
-  const Icon = item.icon;
-
-  return (
-    <Tooltip delayDuration={0}>
-      <TooltipTrigger asChild>
-        <Link
-          to={item.path}
-          onClick={onNavClick}
-          className={cn(
-            "flex items-center justify-center rounded-lg transition-all duration-150 select-none",
-            "w-10 h-10 mx-auto no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 group",
-            isActive
-              ? "bg-primary text-primary-foreground shadow-xs font-semibold"
-              : "text-muted-foreground hover:text-foreground hover:bg-accent/60"
-          )}
-          aria-label={`${item.label} (${groupTitle})`}
-        >
-          <Icon 
-            className={cn(
-              "w-4 h-4 transition-transform duration-150 ease-out group-hover:scale-110",
-              isActive ? "text-primary-foreground" : "text-muted-foreground/80 group-hover:text-foreground"
-            )} 
-            aria-hidden="true"
-          />
-        </Link>
-      </TooltipTrigger>
-      <TooltipContent 
-        side="right" 
-        sideOffset={12}
-        className="flex items-center gap-2 bg-popover text-popover-foreground border border-border/80 shadow-md py-1.5 px-2.5 text-xs font-medium"
-      >
-        <span className="font-semibold">{item.label}</span>
-        <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground font-mono uppercase tracking-wider">
-          {groupTitle}
-        </span>
-      </TooltipContent>
-    </Tooltip>
   );
 }

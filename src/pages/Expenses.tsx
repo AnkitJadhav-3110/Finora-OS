@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useStore } from '@/store/useStore';
 import { useDataSync } from '@/hooks/useDataSync';
+import { PageHeader } from '@/components/ui/page-header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -408,37 +409,32 @@ export default function Expenses() {
   }, [filteredExpenses]);
 
   return (
-    <div className="container mx-auto p-6 space-y-6 max-w-7xl">
+    <div className="space-y-6 animate-slide-up pb-10">
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-border pb-5">
-        <div>
-          <h1 className="text-3xl font-semibold tracking-tight text-foreground flex items-center gap-2">
-            <Receipt className="w-8 h-8 text-primary" />
-            Expense Management
-          </h1>
-          <p className="text-muted-foreground text-sm">
-            Log transactions, track input tax credit claims, configure auto-categorization rules, and view summaries.
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <Button variant="outline" size="sm" onClick={() => setIsRulesOpen(true)} className="flex items-center gap-1.5 border-primary/20 hover:border-primary">
-            <Sparkles className="w-4 h-4 text-amber-500 animate-pulse" />
-            Smart Rules ({expenseRules.length})
-          </Button>
-          <Button variant="outline" size="sm" onClick={() => setIsImportOpen(true)} className="flex items-center gap-1">
-            <FileSpreadsheet className="w-4 h-4" />
-            Import CSV
-          </Button>
-          <Button variant="outline" size="sm" onClick={handleExportCsv} className="flex items-center gap-1">
-            <Download className="w-4 h-4" />
-            Export CSV
-          </Button>
-          <Button onClick={() => { resetForm(); setIsFormOpen(true); }} className="shadow-md">
-            <Plus className="w-4 h-4 mr-1.5" />
-            Log Expense
-          </Button>
-        </div>
-      </div>
+      <PageHeader
+        title="Expenses"
+        description="Operational expenditure, vendor disbursements, tax deductions, and categorization"
+        action={
+          <div className="flex flex-wrap items-center gap-2">
+            <Button variant="outline" size="sm" onClick={() => setIsRulesOpen(true)} className="flex items-center gap-1.5 border-primary/20 hover:border-primary">
+              <Sparkles className="w-4 h-4 text-amber-500 animate-pulse" />
+              Smart Rules ({expenseRules.length})
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => setIsImportOpen(true)} className="flex items-center gap-1">
+              <FileSpreadsheet className="w-4 h-4" />
+              Import CSV
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleExportCsv} className="flex items-center gap-1">
+              <Download className="w-4 h-4" />
+              Export CSV
+            </Button>
+            <Button onClick={() => { resetForm(); setIsFormOpen(true); }} className="shadow-md">
+              <Plus className="w-4 h-4 mr-1.5" />
+              Log Expense
+            </Button>
+          </div>
+        }
+      />
 
       {/* Metric Cards Banner */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
