@@ -136,8 +136,8 @@ export function Sidebar({ collapsed, onToggle, isMobileOpen, onMobileClose }: Si
         id="finora-desktop-sidebar"
         className={cn(
           "fixed left-0 top-0 z-50 h-screen flex flex-col",
-          "bg-surface border-r border-border shadow-xs",
-          "transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]",
+          "bg-surface-deep/95 backdrop-blur-xl border-r border-border/70 shadow-xs",
+          "transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]",
           "hidden lg:flex select-none",
           collapsed ? "lg:w-[68px]" : "lg:w-64"
         )}
@@ -276,10 +276,8 @@ function SidebarInner({
               to="/invoices/create"
               onClick={onNavClick}
               className={cn(
-                "group relative flex items-center rounded-lg transition-all duration-150 ease-in-out select-none font-medium",
-                location.pathname === '/invoices/create'
-                  ? "bg-primary text-primary-foreground shadow-xs ring-2 ring-primary/30"
-                  : "bg-primary text-primary-foreground hover:bg-primary/90 shadow-xs",
+                "group relative flex items-center rounded-xl transition-all duration-200 select-none font-semibold",
+                "gradient-primary text-white shadow-sm hover:brightness-110 hover:shadow-[0_0_20px_-3px_rgba(91,140,255,0.45)] border border-white/10 active:scale-[0.98]",
                 collapsed
                   ? "w-10 h-10 mx-auto justify-center"
                   : "w-full px-3 py-2 justify-center gap-2 text-xs"
@@ -301,7 +299,7 @@ function SidebarInner({
             <TooltipContent
               side="right"
               sideOffset={12}
-              className="font-medium bg-primary text-primary-foreground border-0 shadow-md text-xs py-1 px-2.5"
+              className="font-semibold gradient-primary text-white border-0 shadow-md text-xs py-1 px-2.5"
             >
               Create Invoice
             </TooltipContent>
@@ -319,11 +317,11 @@ function SidebarInner({
             <div key={group.id} className="space-y-0.5">
               {/* Category Header */}
               {!collapsed ? (
-                <div className="px-2 pt-1 pb-1 text-[10.5px] font-semibold tracking-wider text-muted-foreground/70 uppercase">
+                <div className="px-2 pt-1 pb-1 text-[10.5px] font-semibold tracking-wider text-muted-foreground/60 uppercase">
                   {group.title}
                 </div>
               ) : (
-                <div className="h-px bg-border/50 my-2 mx-1" />
+                <div className="h-px bg-border/40 my-2 mx-1" />
               )}
 
               {/* Category Items */}
@@ -340,18 +338,18 @@ function SidebarInner({
                             to={item.path}
                             onClick={onNavClick}
                             className={cn(
-                              "flex items-center justify-center rounded-lg transition-all duration-150 select-none",
+                              "flex items-center justify-center rounded-xl transition-all duration-200 select-none",
                               "w-10 h-10 mx-auto no-underline group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
                               active
-                                ? "bg-primary text-primary-foreground font-semibold shadow-xs"
-                                : "text-muted-foreground hover:text-foreground hover:bg-surface-hover/80"
+                                ? "bg-primary/15 text-primary font-semibold shadow-xs border border-primary/30"
+                                : "text-muted-foreground hover:text-foreground hover:bg-white/[0.04] border border-transparent"
                             )}
                             aria-label={`${item.label} (${group.title})`}
                           >
                             <Icon
                               className={cn(
-                                "w-4 h-4 transition-transform duration-150 group-hover:scale-110",
-                                active ? "text-primary-foreground" : "text-muted-foreground group-hover:text-foreground"
+                                "w-4 h-4 transition-transform duration-200 group-hover:scale-110",
+                                active ? "text-primary filter drop-shadow-[0_0_6px_rgba(91,140,255,0.5)]" : "text-muted-foreground group-hover:text-foreground"
                               )}
                               aria-hidden="true"
                             />
@@ -360,9 +358,9 @@ function SidebarInner({
                         <TooltipContent
                           side="right"
                           sideOffset={12}
-                          className="flex items-center gap-2 bg-popover text-popover-foreground border border-border shadow-md py-1.5 px-2.5 text-xs"
+                          className="flex items-center gap-2 bg-popover text-popover-foreground border border-border/80 shadow-md py-1.5 px-2.5 text-xs"
                         >
-                          <span className="font-medium">{item.label}</span>
+                          <span className="font-semibold">{item.label}</span>
                           <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground uppercase font-mono tracking-wider">
                             {group.title}
                           </span>
@@ -377,24 +375,24 @@ function SidebarInner({
                       to={item.path}
                       onClick={onNavClick}
                       className={cn(
-                        "flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 transition-all duration-150 group select-none",
+                        "flex items-center gap-2.5 rounded-xl px-2.5 py-1.5 transition-all duration-200 group select-none relative",
                         "font-medium text-[13px] no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40",
                         active
-                          ? "bg-primary text-primary-foreground font-semibold shadow-xs"
-                          : "text-muted-foreground hover:text-foreground hover:bg-surface-hover/80 active:bg-surface-hover"
+                          ? "bg-gradient-to-r from-primary/15 via-primary/[0.08] to-transparent text-foreground font-semibold border border-primary/25 shadow-xs"
+                          : "text-muted-foreground hover:text-foreground hover:bg-white/[0.04] border border-transparent"
                       )}
                     >
                       <Icon
                         className={cn(
-                          "w-4 h-4 flex-shrink-0 transition-transform duration-150 group-hover:scale-105",
-                          active ? "text-primary-foreground" : "text-muted-foreground/80 group-hover:text-foreground"
+                          "w-4 h-4 flex-shrink-0 transition-transform duration-200 group-hover:scale-105",
+                          active ? "text-primary filter drop-shadow-[0_0_6px_rgba(91,140,255,0.45)]" : "text-muted-foreground/80 group-hover:text-foreground"
                         )}
                         aria-hidden="true"
                       />
                       <span className="truncate">{item.label}</span>
                       {active && (
                         <span
-                          className="ml-auto w-1.5 h-1.5 rounded-full bg-primary-foreground/90 shrink-0"
+                          className="ml-auto w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_8px_rgba(91,140,255,0.9)] shrink-0"
                           aria-hidden="true"
                         />
                       )}
@@ -408,7 +406,7 @@ function SidebarInner({
       </nav>
 
       {/* Pinned Bottom Section: Settings & Help/Support */}
-      <div className="p-3 border-t border-border/80 flex-shrink-0 bg-surface/90 space-y-1">
+      <div className="p-3 border-t border-border/70 flex-shrink-0 bg-surface-deep/90 space-y-1">
         {/* Settings */}
         {collapsed ? (
           <Tooltip delayDuration={0}>
@@ -417,10 +415,10 @@ function SidebarInner({
                 to="/settings"
                 onClick={onNavClick}
                 className={cn(
-                  "flex items-center justify-center rounded-lg transition-all duration-150 w-10 h-10 mx-auto",
+                  "flex items-center justify-center rounded-xl transition-all duration-200 w-10 h-10 mx-auto",
                   isItemActive('/settings')
-                    ? "bg-primary text-primary-foreground font-semibold shadow-xs"
-                    : "text-muted-foreground hover:text-foreground hover:bg-surface-hover/80"
+                    ? "bg-primary/15 text-primary font-semibold shadow-xs border border-primary/30"
+                    : "text-muted-foreground hover:text-foreground hover:bg-white/[0.04] border border-transparent"
                 )}
                 aria-label="Settings"
               >
@@ -436,14 +434,17 @@ function SidebarInner({
             to="/settings"
             onClick={onNavClick}
             className={cn(
-              "flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 transition-all duration-150 font-medium text-[13px]",
+              "flex items-center gap-2.5 rounded-xl px-2.5 py-1.5 transition-all duration-200 font-medium text-[13px]",
               isItemActive('/settings')
-                ? "bg-primary text-primary-foreground font-semibold shadow-xs"
-                : "text-muted-foreground hover:text-foreground hover:bg-surface-hover/80"
+                ? "bg-gradient-to-r from-primary/15 via-primary/[0.08] to-transparent text-foreground font-semibold border border-primary/25 shadow-xs"
+                : "text-muted-foreground hover:text-foreground hover:bg-white/[0.04] border border-transparent"
             )}
           >
-            <Settings className="w-4 h-4 shrink-0" />
+            <Settings className={cn("w-4 h-4 shrink-0", isItemActive('/settings') ? "text-primary filter drop-shadow-[0_0_6px_rgba(91,140,255,0.4)]" : "")} />
             <span className="truncate">Settings</span>
+            {isItemActive('/settings') && (
+              <span className="ml-auto w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_8px_rgba(91,140,255,0.9)] shrink-0" aria-hidden="true" />
+            )}
           </Link>
         )}
 

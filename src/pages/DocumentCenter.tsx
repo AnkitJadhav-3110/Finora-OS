@@ -1,12 +1,14 @@
 import React, { useState, useMemo } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { useStore } from '@/store/useStore';
 import { useDataSync } from '@/hooks/useDataSync';
+import { PageHeader } from '@/components/ui/page-header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { toast } from 'sonner';
 import {
   Folder,
@@ -26,7 +28,8 @@ import {
   Plus,
   ArrowLeft,
   X,
-  FileCheck
+  FileCheck,
+  FolderOpen
 } from 'lucide-react';
 
 const DOCUMENT_TYPES = [
@@ -218,270 +221,283 @@ export default function DocumentCenter() {
   };
 
   return (
-    <div className="container mx-auto p-6 space-y-6 max-w-7xl">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-border pb-5">
-        <div>
-          <h1 className="text-3xl font-semibold tracking-tight text-foreground flex items-center gap-2">
-            <HardDrive className="w-8 h-8 text-primary" />
-            Centralized Document Center
-          </h1>
-          <p className="text-muted-foreground text-sm">
-            Secure client contracts, tax filings, vendor receipts, and accounting documents with integrated soft-delete safety.
-          </p>
+    <>
+      <Helmet>
+        <title>Document Center | Finora</title>
+        <meta name="description" content="Centralized business document vault, invoices, tax filings, and receipt archives in Finora." />
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
+
+      <div className="space-y-6 animate-slide-up">
+        <PageHeader
+          title={viewBin ? "Recycle Bin Vault" : "Document Center"}
+          description={viewBin ? "Recover or permanently purge soft-deleted business receipts, contracts, and filings" : "Secure client contracts, tax filings, vendor receipts, and accounting documents with integrated soft-delete safety"}
+          action={
+            <div className="flex flex-wrap items-center gap-2">
+              {viewBin ? (
+                <Button variant="outline" size="sm" onClick={() => setViewBin(false)} className="gap-1.5">
+                  <ArrowLeft className="w-3.5 h-3.5" />
+                  Active Storage
+                </Button>
+              ) : (
+                <Button variant="outline" size="sm" onClick={() => setViewBin(true)} className="gap-1.5 text-muted-foreground hover:text-destructive hover:border-destructive/30">
+                  <Trash2 className="w-3.5 h-3.5" />
+                  Recycle Bin ({stats.trashCount})
+                </Button>
+              )}
+
+              <Button variant="outline" size="sm" onClick={() => setIsFolderOpen(true)} className="gap-1.5">
+                <FolderPlus className="w-3.5 h-3.5" />
+                New Folder
+              </Button>
+
+              <Button size="sm" onClick={() => setIsUploadOpen(true)} className="gap-1.5">
+                <Upload className="w-3.5 h-3.5" />
+                Upload Document
+              </Button>
+            </div>
+          }
+        />
+
+        {/* Storage Meter Summary */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <Card className="shadow-sm border-border/80">
+            <CardContent className="p-4 flex items-center gap-3.5">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                <HardDrive className="w-5 h-5" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Vault Storage</p>
+                <p className="text-base font-semibold text-foreground tracking-tight">
+                  {stats.storageUsedMB.toFixed(2)} MB <span className="text-xs font-normal text-muted-foreground">/ 100 MB</span>
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="shadow-sm border-border/80">
+            <CardContent className="p-4 flex items-center gap-3.5">
+              <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-600 shrink-0">
+                <FileCheck className="w-5 h-5" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Active Documents</p>
+                <p className="text-base font-semibold text-foreground tracking-tight">
+                  {stats.fileCount} <span className="text-xs font-normal text-muted-foreground">archived items</span>
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="shadow-sm border-border/80">
+            <CardContent className="p-4 flex items-center gap-3.5">
+              <div className="w-10 h-10 rounded-xl bg-rose-500/10 flex items-center justify-center text-rose-600 shrink-0">
+                <Trash2 className="w-5 h-5" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Recycle Bin</p>
+                <p className="text-base font-semibold text-foreground tracking-tight">
+                  {stats.trashCount} <span className="text-xs font-normal text-muted-foreground">soft-deleted</span>
+                </p>
+              </div>
+            </CardContent>
+          </Card>
         </div>
-        <div className="flex gap-2">
-          {viewBin ? (
-            <Button variant="outline" size="sm" onClick={() => setViewBin(false)} className="flex items-center gap-1">
-              <ArrowLeft className="w-4 h-4" />
-              Back to Storage
-            </Button>
-          ) : (
-            <Button variant="outline" size="sm" onClick={() => setViewBin(true)} className="flex items-center gap-1.5 border-destructive/20 hover:border-destructive text-destructive hover:bg-destructive/10">
-              <Trash2 className="w-4 h-4" />
-              Recycle Bin ({stats.trashCount})
-            </Button>
-          )}
 
-          <Button variant="outline" size="sm" onClick={() => setIsFolderOpen(true)} className="flex items-center gap-1">
-            <FolderPlus className="w-4 h-4" />
-            New Folder
-          </Button>
-
-          <Button onClick={() => setIsUploadOpen(true)} className="flex items-center gap-1.5 shadow-md">
-            <Upload className="w-4 h-4" />
-            Upload Document
-          </Button>
-        </div>
-      </div>
-
-      {/* Storage Meter Summary */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="shadow-sm">
-          <CardContent className="p-4 flex items-center gap-4">
-            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-              <HardDrive className="w-5 h-5" />
-            </div>
-            <div>
-              <p className="text-[10px] uppercase font-semibold text-muted-foreground">Emulated Disk Storage</p>
-              <p className="text-lg font-bold text-foreground">
-                {stats.storageUsedMB.toFixed(2)} MB / 100 MB
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="shadow-sm">
-          <CardContent className="p-4 flex items-center gap-4">
-            <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-slate-800 flex items-center justify-center text-emerald-600">
-              <FileCheck className="w-5 h-5" />
-            </div>
-            <div>
-              <p className="text-[10px] uppercase font-semibold text-muted-foreground">Active Documents</p>
-              <p className="text-lg font-bold text-foreground">
-                {stats.fileCount} items archived
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="shadow-sm">
-          <CardContent className="p-4 flex items-center gap-4">
-            <div className="w-10 h-10 rounded-xl bg-rose-100 dark:bg-slate-800 flex items-center justify-center text-rose-600">
-              <Trash2 className="w-5 h-5" />
-            </div>
-            <div>
-              <p className="text-[10px] uppercase font-semibold text-muted-foreground">Trash (Recycle Bin)</p>
-              <p className="text-lg font-bold text-foreground">
-                {stats.trashCount} soft-deleted files
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Workspace Area split into Folder Sidebar + Files Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        
-        {/* Sidebar Folders list */}
-        <Card className="shadow-sm border border-border h-fit">
-          <CardHeader className="p-4 border-b border-border bg-muted/35">
-            <CardTitle className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Folders & Groupings</CardTitle>
-          </CardHeader>
-          <CardContent className="p-2 space-y-1">
-            <button
-              onClick={() => { setSelectedFolderId('all'); setViewBin(false); }}
-              className={`w-full flex items-center justify-between text-left px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                selectedFolderId === 'all' && !viewBin
-                  ? 'bg-primary text-white shadow-sm'
-                  : 'text-foreground hover:bg-accent hover:text-accent-foreground'
-              }`}
-            >
-              <span className="flex items-center gap-2">
-                <HardDrive className="w-4 h-4" />
-                All Document Vaults
-              </span>
-              <Badge variant={selectedFolderId === 'all' && !viewBin ? "secondary" : "outline"} className="text-[10px]">
-                {documents.filter(d => !d.isDeleted).length}
-              </Badge>
-            </button>
-
-            {folders.map(folder => (
+        {/* Workspace Area split into Folder Navigation + Files Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-start">
+          
+          {/* Folders navigation panel */}
+          <Card className="shadow-sm border-border/80 md:sticky md:top-20">
+            <CardHeader className="p-3.5 border-b border-border/60 bg-muted/20 flex flex-row items-center justify-between">
+              <CardTitle className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                Vault Directories
+              </CardTitle>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6"
+                onClick={() => setIsFolderOpen(true)}
+                title="Create folder"
+              >
+                <Plus className="w-3.5 h-3.5" />
+              </Button>
+            </CardHeader>
+            <CardContent className="p-2 space-y-1">
               <button
-                key={folder.id}
-                onClick={() => { setSelectedFolderId(folder.id); setViewBin(false); }}
-                className={`w-full flex items-center justify-between text-left px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                  selectedFolderId === folder.id && !viewBin
-                    ? 'bg-primary text-white shadow-sm'
-                    : 'text-foreground hover:bg-accent hover:text-accent-foreground'
+                type="button"
+                onClick={() => { setSelectedFolderId('all'); setViewBin(false); }}
+                className={`w-full flex items-center justify-between text-left px-3 py-2 rounded-md text-xs font-medium transition-colors ${
+                  selectedFolderId === 'all' && !viewBin
+                    ? 'bg-primary text-primary-foreground font-semibold'
+                    : 'text-foreground hover:bg-muted/70'
                 }`}
               >
-                <span className="flex items-center gap-2 truncate">
-                  <Folder className="w-4 h-4" />
-                  <span className="truncate">{folder.name}</span>
+                <span className="flex items-center gap-2">
+                  <HardDrive className="w-3.5 h-3.5" />
+                  All Files
                 </span>
-                <Badge variant={selectedFolderId === folder.id && !viewBin ? "secondary" : "outline"} className="text-[10px]">
-                  {documents.filter(d => d.folderId === folder.id && !d.isDeleted).length}
+                <Badge variant={selectedFolderId === 'all' && !viewBin ? "secondary" : "outline"} className="text-[10px] px-1.5 py-0 h-4">
+                  {documents.filter(d => !d.isDeleted).length}
                 </Badge>
               </button>
-            ))}
-          </CardContent>
-        </Card>
 
-        {/* Files Browser */}
-        <div className="md:col-span-3 space-y-4">
-          
-          {/* Browser Controls */}
-          <Card className="shadow-sm border border-border p-3">
+              {folders.map(folder => (
+                <button
+                  type="button"
+                  key={folder.id}
+                  onClick={() => { setSelectedFolderId(folder.id); setViewBin(false); }}
+                  className={`w-full flex items-center justify-between text-left px-3 py-2 rounded-md text-xs font-medium transition-colors ${
+                    selectedFolderId === folder.id && !viewBin
+                      ? 'bg-primary text-primary-foreground font-semibold'
+                      : 'text-foreground hover:bg-muted/70'
+                  }`}
+                >
+                  <span className="flex items-center gap-2 truncate">
+                    <Folder className="w-3.5 h-3.5 shrink-0" />
+                    <span className="truncate">{folder.name}</span>
+                  </span>
+                  <Badge variant={selectedFolderId === folder.id && !viewBin ? "secondary" : "outline"} className="text-[10px] px-1.5 py-0 h-4 shrink-0">
+                    {documents.filter(d => d.folderId === folder.id && !d.isDeleted).length}
+                  </Badge>
+                </button>
+              ))}
+            </CardContent>
+          </Card>
+
+          {/* Files Browser & Operations */}
+          <div className="md:col-span-3 space-y-4">
+            
+            {/* Filter and Search Bar */}
             <div className="flex flex-col sm:flex-row gap-3">
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
                 <Input
-                  placeholder="Search file names, formats, categories..."
+                  placeholder="Search file name, type, or extension..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-9 bg-card border-border h-9 text-xs"
+                  className="pl-9 h-9 text-xs"
                 />
               </div>
 
               <Select value={selectedTypeFilter} onValueChange={setSelectedTypeFilter}>
-                <SelectTrigger className="w-full sm:w-[180px] bg-card border-border h-9 text-xs">
-                  <Filter className="w-3.5 h-3.5 mr-1.5 opacity-60" />
+                <SelectTrigger className="w-full sm:w-[190px] h-9 text-xs">
+                  <Filter className="w-3.5 h-3.5 mr-1.5 text-muted-foreground" />
                   <SelectValue placeholder="All Categories" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All File Formats</SelectItem>
+                  <SelectItem value="all">All Document Types</SelectItem>
                   {DOCUMENT_TYPES.map(type => (
                     <SelectItem key={type.value} value={type.value}>{type.label}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
-          </Card>
 
-          {/* Drag & Drop Upload Zone */}
-          {!viewBin && (
-            <div
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onDrop={handleDrop}
-              className={`border-2 border-dashed rounded-xl p-6 text-center transition-all duration-200 cursor-pointer ${
-                isDragging 
-                  ? 'border-primary bg-primary/5 scale-[0.99] shadow-inner' 
-                  : 'border-border/80 hover:border-primary/55 bg-muted/20'
-              }`}
-              onClick={() => setIsUploadOpen(true)}
-            >
-              <div className="flex flex-col items-center justify-center space-y-2">
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                  <Upload className="w-5 h-5" />
-                </div>
-                <div>
-                  <p className="text-xs font-semibold">Drag & drop files here, or click to upload</p>
-                  <p className="text-[10px] text-muted-foreground mt-0.5">Supports PDF contracts, tax sheets, receipts, or images (Max 10MB)</p>
+            {/* Drag & Drop Upload Zone */}
+            {!viewBin && (
+              <div
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+                className={`border border-dashed rounded-xl p-6 text-center transition-all cursor-pointer ${
+                  isDragging 
+                    ? 'border-primary bg-primary/5' 
+                    : 'border-border/80 hover:border-primary/50 bg-muted/15'
+                }`}
+                onClick={() => setIsUploadOpen(true)}
+              >
+                <div className="flex flex-col items-center justify-center space-y-1.5">
+                  <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                    <Upload className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold text-foreground">Drag & drop documents here, or click to upload</p>
+                    <p className="text-[11px] text-muted-foreground">PDF contracts, tax filings, vendor receipts, invoices (Max 10MB)</p>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
-
-          {/* Files Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredDocuments.length === 0 ? (
-              <div className="col-span-full border border-dashed border-border rounded-xl p-12 text-center text-muted-foreground bg-card">
-                <File className="w-12 h-12 text-muted-foreground/45 mx-auto mb-3" />
-                <h3 className="font-semibold text-sm text-foreground">
-                  {viewBin ? 'Recycle Bin is empty' : 'No documents in this Vault'}
-                </h3>
-                <p className="text-xs mt-1">
-                  {viewBin ? 'Great! No soft-deleted ledger items found.' : 'Upload reference files or create specialized folders.'}
-                </p>
-                {!viewBin && (
-                  <Button variant="outline" size="sm" onClick={() => setIsUploadOpen(true)} className="mt-3">
-                    Upload Reference
-                  </Button>
-                )}
-              </div>
-            ) : (
-              filteredDocuments.map(doc => {
-                const docTypeMeta = DOCUMENT_TYPES.find(t => t.value === doc.type);
-                return (
-                  <Card key={doc.id} className="shadow-sm border border-border group hover:shadow-md transition-all duration-200 bg-card overflow-hidden">
-                    <CardHeader className="p-4 pb-2 border-b border-border/40 bg-muted/15 flex flex-row items-start justify-between gap-2">
-                      <div className="flex items-center gap-2.5 truncate">
-                        <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary flex-shrink-0">
-                          <FileText className="w-4 h-4" />
-                        </div>
-                        <div className="truncate">
-                          <h4 className="text-xs font-bold text-foreground truncate" title={doc.name}>
-                            {doc.name}
-                          </h4>
-                          <p className="text-[10px] text-muted-foreground">
-                            {(doc.fileSize / (1024 * 1024)).toFixed(2)} MB
-                          </p>
-                        </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="p-4 space-y-4">
-                      <div className="flex justify-between items-center text-[10px]">
-                        <Badge variant="outline" className="text-[9px] py-0 px-1 border-primary/25 text-primary">
-                          {docTypeMeta ? docTypeMeta.label : doc.type}
-                        </Badge>
-                        <span className="text-muted-foreground flex items-center gap-1">
-                          <Clock className="w-3 h-3" />
-                          {doc.createdAt?.slice(0, 10)}
-                        </span>
-                      </div>
-
-                      {/* Action buttons inside Card */}
-                      <div className="flex justify-end gap-1.5 pt-2 border-t border-border/50">
-                        {doc.isDeleted ? (
-                          <>
-                            <Button variant="outline" size="xs" className="h-7 px-2 text-xs text-primary" onClick={() => handleRestore(doc.id)}>
-                              <Undo2 className="w-3.5 h-3.5 mr-1" /> Restore
-                            </Button>
-                            <Button variant="ghost" size="xs" className="h-7 px-2 text-xs text-destructive hover:bg-destructive/10" onClick={() => handleDeletePermanent(doc.id)}>
-                              <Trash2 className="w-3.5 h-3.5 mr-1" /> Permanent Delete
-                            </Button>
-                          </>
-                        ) : (
-                          <>
-                            <Button variant="outline" size="icon" className="h-7 w-7 text-muted-foreground hover:text-foreground" onClick={() => handleDownload(doc)} title="Download file">
-                              <Download className="w-3.5 h-3.5" />
-                            </Button>
-                            <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:bg-destructive/10 hover:text-destructive" onClick={() => handleSoftDelete(doc.id)} title="Soft delete to recycle bin">
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </Button>
-                          </>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })
             )}
+
+            {/* Files Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+              {filteredDocuments.length === 0 ? (
+                <div className="col-span-full border border-dashed border-border/80 rounded-xl p-12 text-center text-muted-foreground bg-card">
+                  <File className="w-10 h-10 text-muted-foreground/40 mx-auto mb-2.5" />
+                  <h3 className="font-semibold text-sm text-foreground">
+                    {viewBin ? 'Recycle Bin is empty' : 'No documents found'}
+                  </h3>
+                  <p className="text-xs text-muted-foreground mt-1 max-w-sm mx-auto">
+                    {viewBin ? 'No soft-deleted records in storage.' : 'No files matching the selected directory or filter. Upload reference documents to get started.'}
+                  </p>
+                  {!viewBin && (
+                    <Button size="sm" onClick={() => setIsUploadOpen(true)} className="mt-3.5 gap-1.5">
+                      <Plus className="w-3.5 h-3.5" />
+                      Upload File
+                    </Button>
+                  )}
+                </div>
+              ) : (
+                filteredDocuments.map(doc => {
+                  const docTypeMeta = DOCUMENT_TYPES.find(t => t.value === doc.type);
+                  return (
+                    <Card key={doc.id} className="shadow-sm border-border/70 hover:border-border transition-all bg-card overflow-hidden">
+                      <CardHeader className="p-3.5 pb-2.5 border-b border-border/50 bg-muted/10 flex flex-row items-start justify-between gap-2">
+                        <div className="flex items-center gap-2.5 truncate min-w-0">
+                          <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                            <FileText className="w-4 h-4" />
+                          </div>
+                          <div className="truncate min-w-0">
+                            <h4 className="text-xs font-semibold text-foreground truncate" title={doc.name}>
+                              {doc.name}
+                            </h4>
+                            <p className="text-[11px] text-muted-foreground">
+                              {(doc.fileSize / (1024 * 1024)).toFixed(2)} MB
+                            </p>
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="p-3.5 space-y-3">
+                        <div className="flex justify-between items-center text-[11px]">
+                          <Badge variant="outline" className="text-[10px] font-normal py-0 px-1.5">
+                            {docTypeMeta ? docTypeMeta.label : doc.type}
+                          </Badge>
+                          <span className="text-muted-foreground flex items-center gap-1 text-[11px]">
+                            <Clock className="w-3 h-3" />
+                            {doc.createdAt?.slice(0, 10)}
+                          </span>
+                        </div>
+
+                        {/* Action buttons */}
+                        <div className="flex justify-end gap-1.5 pt-2 border-t border-border/40">
+                          {doc.isDeleted ? (
+                            <>
+                              <Button variant="outline" size="sm" className="h-7 px-2.5 text-xs text-primary" onClick={() => handleRestore(doc.id)}>
+                                <Undo2 className="w-3 h-3 mr-1" /> Restore
+                              </Button>
+                              <Button variant="ghost" size="sm" className="h-7 px-2 text-xs text-destructive hover:bg-destructive/10 hover:text-destructive" onClick={() => handleDeletePermanent(doc.id)}>
+                                <Trash2 className="w-3 h-3 mr-1" /> Purge
+                              </Button>
+                            </>
+                          ) : (
+                            <>
+                              <Button variant="outline" size="icon" className="h-7 w-7 text-muted-foreground hover:text-foreground" onClick={() => handleDownload(doc)} title="Download file">
+                                <Download className="w-3.5 h-3.5" />
+                              </Button>
+                              <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:bg-destructive/10 hover:text-destructive" onClick={() => handleSoftDelete(doc.id)} title="Move to recycle bin">
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </Button>
+                            </>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })
+              )}
+            </div>
           </div>
         </div>
-      </div>
 
       {/* Upload Dialog */}
       <Dialog open={isUploadOpen} onOpenChange={setIsUploadOpen}>
@@ -596,6 +612,7 @@ export default function DocumentCenter() {
           </form>
         </DialogContent>
       </Dialog>
-    </div>
+      </div>
+    </>
   );
 }

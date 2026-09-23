@@ -57,6 +57,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { UpcomingRecurringWidget } from '@/components/dashboard/UpcomingRecurringWidget';
 import { RecentActivityWidget } from '@/components/dashboard/RecentActivityWidget';
+import { DashboardSkeleton } from '@/components/dashboard/DashboardSkeleton';
 import {
   AreaChart,
   Area,
@@ -74,8 +75,8 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const { invoices, clients, expenses, settings, currentBusinessId, businesses } = useStore();
   const { updateInvoice } = useDataSync();
-  const { reload } = useFirebaseSync();
-  const { user } = useAuth();
+  const { reload, loading: syncLoading } = useFirebaseSync();
+  const { user, loading: authLoading } = useAuth();
 
   // State controls
   const [loadingDemo, setLoadingDemo] = useState(false);
@@ -464,7 +465,7 @@ export default function Dashboard() {
 
   const getStatusBadge = (status: string) => {
     const s = status.toLowerCase();
-    const variant = (s === 'paid' ? 'paid' : s === 'sent' ? 'pending' : s === 'overdue' ? 'overdue' : 'draft') as any;
+    const variant = (s === 'paid' ? 'paid' : s === 'sent' ? 'sent' : s === 'overdue' ? 'overdue' : s === 'pending' ? 'pending' : 'draft') as any;
     return (
       <Badge variant={variant} className="capitalize font-semibold text-[11px] px-2 py-0.5">
         {status}
@@ -473,6 +474,19 @@ export default function Dashboard() {
   };
 
   const hasAnyData = invoices.length > 0 || (expenses && expenses.length > 0) || clients.length > 0;
+  const isInitialLoading = (authLoading || syncLoading) && !hasAnyData;
+
+  if (isInitialLoading) {
+    return (
+      <>
+        <Helmet>
+          <title>Dashboard | Finora OS</title>
+          <meta name="description" content="Financial command center: revenue, cash flow, outstanding collections, and invoice pipeline." />
+        </Helmet>
+        <DashboardSkeleton />
+      </>
+    );
+  }
 
   return (
     <>
@@ -481,7 +495,10 @@ export default function Dashboard() {
         <meta name="description" content="Financial command center: revenue, cash flow, outstanding collections, and invoice pipeline." />
       </Helmet>
 
-      <div className="space-y-6 animate-slide-up pb-12 max-w-7xl mx-auto">
+      <div className={`space-y-6 animate-slide-up pb-12 max-w-7xl mx-auto transition-opacity duration-300 ${isRefreshing ? 'opacity-80' : 'opacity-100'}`}>
+        {isRefreshing && (
+          <div className="w-full h-1 skeleton-finora rounded-full overflow-hidden animate-fade-in -mb-3" />
+        )}
         
         {/* =========================================================================
             TOP: PAGE HEADER & CONTEXT CONTROLS
@@ -510,10 +527,10 @@ export default function Dashboard() {
               <button
                 type="button"
                 onClick={() => setDateRange('all')}
-                className={`px-2.5 py-1 text-xs font-medium rounded-md transition-all ${
+                className={`px-2.5 py-1 text-xs font-semibold rounded-md transition-all ${
                   dateRange === 'all'
-                    ? 'bg-card text-foreground shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground'
+                    ? 'gradient-primary text-white shadow-xs'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-white/[0.04]'
                 }`}
               >
                 All Time
@@ -521,10 +538,10 @@ export default function Dashboard() {
               <button
                 type="button"
                 onClick={() => setDateRange('30d')}
-                className={`px-2.5 py-1 text-xs font-medium rounded-md transition-all ${
+                className={`px-2.5 py-1 text-xs font-semibold rounded-md transition-all ${
                   dateRange === '30d'
-                    ? 'bg-card text-foreground shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground'
+                    ? 'gradient-primary text-white shadow-xs'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-white/[0.04]'
                 }`}
               >
                 30 Days
@@ -532,10 +549,10 @@ export default function Dashboard() {
               <button
                 type="button"
                 onClick={() => setDateRange('90d')}
-                className={`px-2.5 py-1 text-xs font-medium rounded-md transition-all ${
+                className={`px-2.5 py-1 text-xs font-semibold rounded-md transition-all ${
                   dateRange === '90d'
-                    ? 'bg-card text-foreground shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground'
+                    ? 'gradient-primary text-white shadow-xs'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-white/[0.04]'
                 }`}
               >
                 Quarter
@@ -543,10 +560,10 @@ export default function Dashboard() {
               <button
                 type="button"
                 onClick={() => setDateRange('ytd')}
-                className={`px-2.5 py-1 text-xs font-medium rounded-md transition-all ${
+                className={`px-2.5 py-1 text-xs font-semibold rounded-md transition-all ${
                   dateRange === 'ytd'
-                    ? 'bg-card text-foreground shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground'
+                    ? 'gradient-primary text-white shadow-xs'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-white/[0.04]'
                 }`}
               >
                 YTD
@@ -559,7 +576,7 @@ export default function Dashboard() {
               size="sm"
               onClick={handleRefresh}
               disabled={isRefreshing}
-              className="h-8 gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+              className="h-8 gap-1.5 text-xs text-muted-foreground hover:text-foreground border-border/70"
               title="Refresh financial data"
             >
               <RotateCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-primary' : ''}`} />
@@ -570,11 +587,11 @@ export default function Dashboard() {
 
         {/* Demo Workspace Banner (shown when empty or workspace has no invoices) */}
         {!hasAnyData && (
-          <Card className="border border-dashed border-primary/40 bg-gradient-to-r from-primary/5 via-primary/[0.02] to-transparent p-6 shadow-sm">
+          <Card className="border border-dashed border-primary/40 bg-gradient-to-r from-primary/10 via-primary/[0.03] to-transparent p-6 shadow-sm">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-5">
               <div className="space-y-1.5 max-w-2xl">
                 <div className="flex items-center gap-2">
-                  <Badge variant="outline" className="border-primary/40 text-primary bg-primary/10 text-xs font-medium">
+                  <Badge variant="active" className="text-xs font-medium">
                     New Workspace
                   </Badge>
                   <span className="text-xs text-muted-foreground">Ready for transactions</span>
@@ -595,7 +612,7 @@ export default function Dashboard() {
                   Create First Invoice
                 </Button>
                 <Button 
-                  variant="outline"
+                  variant="outline" 
                   onClick={handleLoadDemo} 
                   disabled={loadingDemo}
                   className="h-9 px-4 text-xs font-medium gap-1.5"
@@ -614,13 +631,13 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           
           {/* Card 1: Total Revenue */}
-          <Card className="border border-border/80 bg-card shadow-sm hover:border-border transition-all">
-            <CardContent className="p-4 space-y-2">
+          <Card className="kpi-card-finora border border-border/80 bg-surface/90 shadow-sm panel-ambient-glow panel-ambient-success relative overflow-hidden group">
+            <CardContent className="p-4 space-y-2 relative z-10">
               <div className="flex items-center justify-between">
                 <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
                   Total Revenue
                 </span>
-                <span className="p-1.5 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                <span className="p-1.5 rounded-lg bg-emerald-500/10 text-[#32D583] border border-emerald-500/20 shadow-[0_0_12px_rgba(50,213,131,0.15)]">
                   <DollarSign className="w-4 h-4" />
                 </span>
               </div>
@@ -630,7 +647,7 @@ export default function Dashboard() {
                 </div>
                 <div className="flex items-center justify-between text-xs text-muted-foreground pt-1 border-t border-border/40">
                   <span>{stats.paidCount} paid {stats.paidCount === 1 ? 'invoice' : 'invoices'}</span>
-                  <span className="font-medium text-emerald-600 dark:text-emerald-400 flex items-center gap-0.5">
+                  <span className="font-semibold text-[#32D583] flex items-center gap-0.5">
                     <TrendingUp className="w-3 h-3" />
                     {stats.collectionRate.toFixed(0)}% collected
                   </span>
@@ -640,13 +657,13 @@ export default function Dashboard() {
           </Card>
 
           {/* Card 2: Outstanding */}
-          <Card className="border border-border/80 bg-card shadow-sm hover:border-border transition-all">
-            <CardContent className="p-4 space-y-2">
+          <Card className="kpi-card-finora border border-border/80 bg-surface/90 shadow-sm panel-ambient-glow panel-ambient-primary relative overflow-hidden group">
+            <CardContent className="p-4 space-y-2 relative z-10">
               <div className="flex items-center justify-between">
                 <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
                   Outstanding
                 </span>
-                <span className="p-1.5 rounded-md bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                <span className="p-1.5 rounded-lg bg-blue-500/10 text-[#6EA8FF] border border-blue-500/20 shadow-[0_0_12px_rgba(91,140,255,0.15)]">
                   <Clock className="w-4 h-4" />
                 </span>
               </div>
@@ -656,20 +673,20 @@ export default function Dashboard() {
                 </div>
                 <div className="flex items-center justify-between text-xs text-muted-foreground pt-1 border-t border-border/40">
                   <span>{stats.unpaidCount} awaiting payment</span>
-                  <span className="text-blue-600 dark:text-blue-400 font-medium">In grace period</span>
+                  <span className="text-[#6EA8FF] font-semibold">In grace period</span>
                 </div>
               </div>
             </CardContent>
           </Card>
 
           {/* Card 3: Overdue */}
-          <Card className="border border-border/80 bg-card shadow-sm hover:border-border transition-all">
-            <CardContent className="p-4 space-y-2">
+          <Card className="kpi-card-finora border border-border/80 bg-surface/90 shadow-sm panel-ambient-glow panel-ambient-danger relative overflow-hidden group">
+            <CardContent className="p-4 space-y-2 relative z-10">
               <div className="flex items-center justify-between">
                 <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
                   Overdue
                 </span>
-                <span className="p-1.5 rounded-md bg-rose-500/10 text-rose-600 dark:text-rose-400">
+                <span className="p-1.5 rounded-lg bg-rose-500/10 text-[#FF5C70] border border-rose-500/20 shadow-[0_0_12px_rgba(255,92,112,0.15)]">
                   <AlertCircle className="w-4 h-4" />
                 </span>
               </div>
@@ -679,7 +696,7 @@ export default function Dashboard() {
                 </div>
                 <div className="flex items-center justify-between text-xs text-muted-foreground pt-1 border-t border-border/40">
                   <span>{stats.overdueCount} past due date</span>
-                  <span className={stats.overdueCount > 0 ? "font-semibold text-rose-600 dark:text-rose-400" : "text-muted-foreground"}>
+                  <span className={stats.overdueCount > 0 ? "font-semibold text-[#FF5C70]" : "text-muted-foreground"}>
                     {stats.overdueCount > 0 ? "Action required" : "Ledger clear"}
                   </span>
                 </div>
@@ -688,13 +705,13 @@ export default function Dashboard() {
           </Card>
 
           {/* Card 4: Expenses & Cash Flow */}
-          <Card className="border border-border/80 bg-card shadow-sm hover:border-border transition-all">
-            <CardContent className="p-4 space-y-2">
+          <Card className="kpi-card-finora border border-border/80 bg-surface/90 shadow-sm panel-ambient-glow panel-ambient-violet relative overflow-hidden group">
+            <CardContent className="p-4 space-y-2 relative z-10">
               <div className="flex items-center justify-between">
                 <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
                   Expenses & Cash Flow
                 </span>
-                <span className="p-1.5 rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400">
+                <span className="p-1.5 rounded-lg bg-indigo-500/10 text-[#8B7CFF] border border-indigo-500/20 shadow-[0_0_12px_rgba(139,124,255,0.15)]">
                   <Receipt className="w-4 h-4" />
                 </span>
               </div>
@@ -704,7 +721,7 @@ export default function Dashboard() {
                 </div>
                 <div className="flex items-center justify-between text-xs text-muted-foreground pt-1 border-t border-border/40">
                   <span>Net flow:</span>
-                  <span className={`font-semibold ${stats.netCashFlow >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
+                  <span className={`font-semibold ${stats.netCashFlow >= 0 ? 'text-[#32D583]' : 'text-[#FF5C70]'}`}>
                     {formatCurrency(stats.netCashFlow)}
                   </span>
                 </div>
@@ -717,11 +734,11 @@ export default function Dashboard() {
         {/* =========================================================================
             QUICK ACTIONS STRIP
            ========================================================================= */}
-        <div className="bg-muted/25 border border-border/70 rounded-xl p-3 flex items-center justify-between gap-3 flex-wrap">
-          <div className="flex items-center gap-2">
+        <div className="bg-surface/80 border border-border/70 rounded-xl p-3 flex items-center justify-between gap-3 flex-wrap backdrop-blur-md shadow-xs panel-ambient-glow relative overflow-hidden">
+          <div className="flex items-center gap-2 relative z-10">
             <span className="text-xs font-semibold text-foreground tracking-tight">Quick Actions:</span>
           </div>
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-2 flex-wrap relative z-10">
             <Button
               size="sm"
               onClick={() => navigate('/invoices/create')}
@@ -735,7 +752,7 @@ export default function Dashboard() {
               variant="outline"
               size="sm"
               onClick={() => navigate('/clients')}
-              className="h-8 text-xs font-medium gap-1.5"
+              className="h-8 text-xs font-medium gap-1.5 border-border/70 hover:bg-white/[0.04]"
             >
               <Users className="w-3.5 h-3.5 text-muted-foreground" />
               Add Client
@@ -745,7 +762,7 @@ export default function Dashboard() {
               variant="outline"
               size="sm"
               onClick={() => navigate('/expenses')}
-              className="h-8 text-xs font-medium gap-1.5"
+              className="h-8 text-xs font-medium gap-1.5 border-border/70 hover:bg-white/[0.04]"
             >
               <Receipt className="w-3.5 h-3.5 text-muted-foreground" />
               Record Expense
@@ -761,7 +778,7 @@ export default function Dashboard() {
                   setIsRecordPaymentOpen(true);
                 }
               }}
-              className="h-8 text-xs font-medium gap-1.5"
+              className="h-8 text-xs font-medium gap-1.5 border-border/70 hover:bg-white/[0.04]"
             >
               <Coins className="w-3.5 h-3.5 text-muted-foreground" />
               Log Payment
@@ -785,8 +802,8 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
           {/* Main Financial Chart (2 Columns on Large Screens) */}
-          <Card className="lg:col-span-2 border-border/80 bg-card shadow-sm">
-            <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-3 gap-3">
+          <Card className="lg:col-span-2 border border-border/70 bg-surface/90 shadow-sm panel-ambient-glow panel-ambient-primary relative overflow-hidden">
+            <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-3 gap-3 relative z-10">
               <div>
                 <CardTitle className="text-base font-semibold flex items-center gap-2 text-foreground">
                   <TrendingUp className="w-4 h-4 text-primary" />
@@ -798,14 +815,14 @@ export default function Dashboard() {
               </div>
 
               {/* View Toggles based on actual data */}
-              <div className="flex items-center bg-muted/50 p-0.5 rounded-lg border border-border/60 self-start sm:self-auto">
+              <div className="flex items-center bg-muted/40 p-0.5 rounded-lg border border-border/60 self-start sm:self-auto">
                 <button
                   type="button"
                   onClick={() => setActiveChartTab('revenue')}
-                  className={`px-2.5 py-1 text-xs font-medium rounded-md transition-all ${
+                  className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${
                     activeChartTab === 'revenue'
-                      ? 'bg-card text-foreground shadow-sm'
-                      : 'text-muted-foreground hover:text-foreground'
+                      ? 'gradient-primary text-white shadow-xs'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-white/[0.04]'
                   }`}
                 >
                   Revenue
@@ -813,10 +830,10 @@ export default function Dashboard() {
                 <button
                   type="button"
                   onClick={() => setActiveChartTab('cashflow')}
-                  className={`px-2.5 py-1 text-xs font-medium rounded-md transition-all ${
+                  className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${
                     activeChartTab === 'cashflow'
-                      ? 'bg-card text-foreground shadow-sm'
-                      : 'text-muted-foreground hover:text-foreground'
+                      ? 'gradient-primary text-white shadow-xs'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-white/[0.04]'
                   }`}
                 >
                   Cash Flow
@@ -824,10 +841,10 @@ export default function Dashboard() {
                 <button
                   type="button"
                   onClick={() => setActiveChartTab('expenses')}
-                  className={`px-2.5 py-1 text-xs font-medium rounded-md transition-all ${
+                  className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${
                     activeChartTab === 'expenses'
-                      ? 'bg-card text-foreground shadow-sm'
-                      : 'text-muted-foreground hover:text-foreground'
+                      ? 'gradient-primary text-white shadow-xs'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-white/[0.04]'
                   }`}
                 >
                   Expenses
@@ -835,31 +852,47 @@ export default function Dashboard() {
               </div>
             </CardHeader>
 
-            <CardContent>
+            <CardContent className="pt-2 relative z-10">
               <div className="h-[280px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   {activeChartTab === 'revenue' ? (
                     <AreaChart data={stats.monthlyData} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
                       <defs>
                         <linearGradient id="finoraColorRevenue" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#10b981" stopOpacity={0.25} />
-                          <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                          <stop offset="5%" stopColor="#5B8CFF" stopOpacity={0.20} />
+                          <stop offset="60%" stopColor="#6366F1" stopOpacity={0.08} />
+                          <stop offset="95%" stopColor="#8B7CFF" stopOpacity={0} />
                         </linearGradient>
                         <linearGradient id="finoraColorBilled" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.15} />
-                          <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                          <stop offset="5%" stopColor="#43D9FF" stopOpacity={0.18} />
+                          <stop offset="60%" stopColor="#5B8CFF" stopOpacity={0.06} />
+                          <stop offset="95%" stopColor="#5B8CFF" stopOpacity={0} />
                         </linearGradient>
+                        {/* Active series outer drop-shadow glow (0.18 opacity) based on --gradient-primary and --gradient-cyan */}
+                        <filter id="finoraGlowPrimary" x="-20%" y="-20%" width="140%" height="140%">
+                          <feDropShadow dx="0" dy="4" stdDeviation="4.5" floodColor="#5B8CFF" floodOpacity="0.18" />
+                        </filter>
+                        <filter id="finoraGlowCyan" x="-20%" y="-20%" width="140%" height="140%">
+                          <feDropShadow dx="0" dy="4" stdDeviation="4.5" floodColor="#43D9FF" floodOpacity="0.18" />
+                        </filter>
                       </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} opacity={0.6} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} opacity={0.4} />
                       <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" fontSize={11} tickLine={false} />
                       <YAxis stroke="hsl(var(--muted-foreground))" fontSize={11} tickLine={false} axisLine={false} />
                       <Tooltip
                         contentStyle={{
-                          backgroundColor: 'hsl(var(--card))',
-                          border: '1px solid hsl(var(--border))',
-                          borderRadius: '8px',
-                          fontSize: '12px'
+                          backgroundColor: 'rgba(16, 23, 34, 0.94)',
+                          backdropFilter: 'blur(16px)',
+                          WebkitBackdropFilter: 'blur(16px)',
+                          border: '1px solid rgba(91, 140, 255, 0.25)',
+                          borderRadius: '10px',
+                          boxShadow: '0 10px 30px rgba(0, 0, 0, 0.6), 0 0 16px rgba(91, 140, 255, 0.12)',
+                          fontSize: '12px',
+                          color: '#F4F7FB',
+                          padding: '8px 12px'
                         }}
+                        itemStyle={{ color: '#F4F7FB' }}
+                        labelStyle={{ color: '#A7B1C2', fontWeight: 600, marginBottom: '4px' }}
                         formatter={(value: number) => [formatCurrency(value), undefined]}
                       />
                       <Legend verticalAlign="top" height={36} iconType="circle" iconSize={8} wrapperStyle={{ fontSize: '11px' }} />
@@ -867,68 +900,95 @@ export default function Dashboard() {
                         name="Collected Revenue"
                         type="monotone"
                         dataKey="revenue"
-                        stroke="#10b981"
-                        strokeWidth={2}
+                        stroke="#5B8CFF"
+                        strokeWidth={2.5}
                         fillOpacity={1}
                         fill="url(#finoraColorRevenue)"
+                        filter="url(#finoraGlowPrimary)"
+                        className="chart-series-glow-primary"
+                        activeDot={{ r: 5, stroke: '#5B8CFF', strokeWidth: 2, fill: '#101722', filter: 'url(#finoraGlowPrimary)' }}
                       />
                       <Area
                         name="Total Billed"
                         type="monotone"
                         dataKey="billed"
-                        stroke="#3b82f6"
+                        stroke="#43D9FF"
                         strokeWidth={1.5}
                         strokeDasharray="4 4"
                         fillOpacity={1}
                         fill="url(#finoraColorBilled)"
+                        filter="url(#finoraGlowCyan)"
+                        className="chart-series-glow-cyan"
+                        activeDot={{ r: 4, stroke: '#43D9FF', strokeWidth: 2, fill: '#101722', filter: 'url(#finoraGlowCyan)' }}
                       />
                     </AreaChart>
                   ) : activeChartTab === 'cashflow' ? (
                     <BarChart data={stats.monthlyData} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} opacity={0.6} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} opacity={0.4} />
                       <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" fontSize={11} tickLine={false} />
                       <YAxis stroke="hsl(var(--muted-foreground))" fontSize={11} tickLine={false} axisLine={false} />
                       <Tooltip
                         contentStyle={{
-                          backgroundColor: 'hsl(var(--card))',
-                          border: '1px solid hsl(var(--border))',
-                          borderRadius: '8px',
-                          fontSize: '12px'
+                          backgroundColor: 'rgba(16, 23, 34, 0.94)',
+                          backdropFilter: 'blur(16px)',
+                          WebkitBackdropFilter: 'blur(16px)',
+                          border: '1px solid rgba(91, 140, 255, 0.25)',
+                          borderRadius: '10px',
+                          boxShadow: '0 10px 30px rgba(0, 0, 0, 0.6), 0 0 16px rgba(91, 140, 255, 0.12)',
+                          fontSize: '12px',
+                          color: '#F4F7FB',
+                          padding: '8px 12px'
                         }}
+                        itemStyle={{ color: '#F4F7FB' }}
+                        labelStyle={{ color: '#A7B1C2', fontWeight: 600, marginBottom: '4px' }}
                         formatter={(value: number) => [formatCurrency(value), undefined]}
                       />
                       <Legend verticalAlign="top" height={36} iconType="circle" iconSize={8} wrapperStyle={{ fontSize: '11px' }} />
-                      <Bar dataKey="revenue" name="Inflow (Revenue)" fill="#10b981" radius={[4, 4, 0, 0]} maxBarSize={24} />
-                      <Bar dataKey="expenses" name="Outflow (Expenses)" fill="#ef4444" radius={[4, 4, 0, 0]} maxBarSize={24} />
+                      <Bar dataKey="revenue" name="Inflow (Revenue)" fill="#32D583" radius={[4, 4, 0, 0]} maxBarSize={24} />
+                      <Bar dataKey="expenses" name="Outflow (Expenses)" fill="#FF5C70" radius={[4, 4, 0, 0]} maxBarSize={24} />
                     </BarChart>
                   ) : (
                     <AreaChart data={stats.monthlyData} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
                       <defs>
                         <linearGradient id="finoraColorExp" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.25} />
-                          <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
+                          <stop offset="5%" stopColor="#8B7CFF" stopOpacity={0.20} />
+                          <stop offset="60%" stopColor="#6366F1" stopOpacity={0.08} />
+                          <stop offset="95%" stopColor="#5B8CFF" stopOpacity={0} />
                         </linearGradient>
+                        <filter id="finoraGlowExpenses" x="-20%" y="-20%" width="140%" height="140%">
+                          <feDropShadow dx="0" dy="4" stdDeviation="4.5" floodColor="#8B7CFF" floodOpacity="0.18" />
+                        </filter>
                       </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} opacity={0.6} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} opacity={0.4} />
                       <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" fontSize={11} tickLine={false} />
                       <YAxis stroke="hsl(var(--muted-foreground))" fontSize={11} tickLine={false} axisLine={false} />
                       <Tooltip
                         contentStyle={{
-                          backgroundColor: 'hsl(var(--card))',
-                          border: '1px solid hsl(var(--border))',
-                          borderRadius: '8px',
-                          fontSize: '12px'
+                          backgroundColor: 'rgba(16, 23, 34, 0.94)',
+                          backdropFilter: 'blur(16px)',
+                          WebkitBackdropFilter: 'blur(16px)',
+                          border: '1px solid rgba(91, 140, 255, 0.25)',
+                          borderRadius: '10px',
+                          boxShadow: '0 10px 30px rgba(0, 0, 0, 0.6), 0 0 16px rgba(91, 140, 255, 0.12)',
+                          fontSize: '12px',
+                          color: '#F4F7FB',
+                          padding: '8px 12px'
                         }}
+                        itemStyle={{ color: '#F4F7FB' }}
+                        labelStyle={{ color: '#A7B1C2', fontWeight: 600, marginBottom: '4px' }}
                         formatter={(value: number) => [formatCurrency(value), 'Expenses']}
                       />
                       <Area
                         name="Expenses"
                         type="monotone"
                         dataKey="expenses"
-                        stroke="#f59e0b"
-                        strokeWidth={2}
+                        stroke="#8B7CFF"
+                        strokeWidth={2.5}
                         fillOpacity={1}
                         fill="url(#finoraColorExp)"
+                        filter="url(#finoraGlowExpenses)"
+                        className="chart-series-glow-violet"
+                        activeDot={{ r: 5, stroke: '#8B7CFF', strokeWidth: 2, fill: '#101722', filter: 'url(#finoraGlowExpenses)' }}
                       />
                     </AreaChart>
                   )}
@@ -938,8 +998,8 @@ export default function Dashboard() {
           </Card>
 
           {/* Invoice Pipeline Section (1 Column) */}
-          <Card className="border-border/80 bg-card shadow-sm flex flex-col justify-between">
-            <CardHeader className="pb-3">
+          <Card className="border border-border/70 bg-surface/90 shadow-sm panel-ambient-glow panel-ambient-cyan flex flex-col justify-between relative overflow-hidden">
+            <CardHeader className="pb-3 relative z-10">
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle className="text-base font-semibold flex items-center gap-2 text-foreground">
@@ -950,13 +1010,13 @@ export default function Dashboard() {
                     Current distribution across billing stages
                   </CardDescription>
                 </div>
-                <Badge variant="outline" className="text-xs font-mono">
+                <Badge variant="outline" className="text-xs font-mono border-border/70">
                   {stats.totalInvoicesCount} Total
                 </Badge>
               </div>
             </CardHeader>
 
-            <CardContent className="space-y-4 pt-1">
+            <CardContent className="space-y-4 pt-1 relative z-10 flex-1">
               {stats.totalInvoicesCount === 0 ? (
                 <div className="text-center py-10 space-y-2">
                   <FileText className="w-8 h-8 text-muted-foreground/30 mx-auto" />
@@ -965,7 +1025,7 @@ export default function Dashboard() {
                     variant="outline" 
                     size="sm" 
                     onClick={() => navigate('/invoices/create')}
-                    className="h-7 text-xs"
+                    className="h-7 text-xs border-border/70"
                   >
                     Draft Invoice
                   </Button>
@@ -975,7 +1035,7 @@ export default function Dashboard() {
                   {stats.pipeline.map((stage) => {
                     const pct = stats.totalInvoicesCount > 0 ? (stage.count / stats.totalInvoicesCount) * 100 : 0;
                     return (
-                      <div key={stage.status} className="space-y-1.5 p-2.5 rounded-lg border border-border/40 bg-muted/20 hover:bg-muted/40 transition-colors">
+                      <div key={stage.status} className="space-y-1.5 p-2.5 rounded-xl border border-border/50 bg-surface-elevated/40 hover:bg-surface-elevated/70 transition-colors">
                         <div className="flex items-center justify-between text-xs">
                           <div className="flex items-center gap-2">
                             <span className={`w-2 h-2 rounded-full ${stage.colorClass.split(' ')[0]}`} />
@@ -986,7 +1046,7 @@ export default function Dashboard() {
                             {formatCurrency(stage.amount)}
                           </span>
                         </div>
-                        <Progress value={pct} className="h-1.5" />
+                        <Progress value={pct} className="h-1.5 bg-muted/40" />
                       </div>
                     );
                   })}
@@ -1009,8 +1069,8 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
           {/* Recent Invoices / Transactions Table (2 Columns) */}
-          <Card className="lg:col-span-2 border-border/80 bg-card shadow-sm">
-            <CardHeader className="flex flex-row items-center justify-between pb-3">
+          <Card className="lg:col-span-2 border border-border/70 bg-surface/90 shadow-sm panel-ambient-glow relative overflow-hidden">
+            <CardHeader className="flex flex-row items-center justify-between pb-3 relative z-10">
               <div>
                 <CardTitle className="text-base font-semibold text-foreground">
                   Recent Invoices & Financial Activity
@@ -1028,11 +1088,11 @@ export default function Dashboard() {
                 Full ledger <ArrowUpRight className="w-3.5 h-3.5" />
               </Button>
             </CardHeader>
-            <CardContent>
+            <CardContent className="relative z-10">
               <div className="overflow-x-auto -mx-2 px-2 sm:mx-0 sm:px-0">
                 <table className="w-full text-left border-collapse text-xs min-w-[560px]">
-                  <thead>
-                    <tr className="border-b border-border text-muted-foreground">
+                  <thead className="table-header-gradient-border">
+                    <tr className="table-header-gradient-border border-b border-border/70 text-muted-foreground/80">
                       <th className="pb-2.5 font-semibold">Invoice</th>
                       <th className="pb-2.5 font-semibold">Client</th>
                       <th className="pb-2.5 font-semibold">Date</th>
@@ -1061,11 +1121,11 @@ export default function Dashboard() {
                       recentInvoices.map((invoice, index) => {
                         const clientObj = clients.find(c => c.id === invoice.clientId);
                         return (
-                          <tr key={`${invoice.id}-${index}`} className="hover:bg-muted/30 transition-colors">
+                          <tr key={`${invoice.id}-${index}`} className="hover:bg-white/[0.03] transition-colors">
                             <td className="py-3 font-semibold text-foreground">
                               <Link 
                                 to={`/invoices/create?id=${invoice.id}`} 
-                                className="hover:underline hover:text-primary font-mono"
+                                className="hover:underline hover:text-primary font-mono text-primary-foreground/90 transition-colors"
                               >
                                 {invoice.invoiceNumber}
                               </Link>
@@ -1095,8 +1155,8 @@ export default function Dashboard() {
           </Card>
 
           {/* Top Clients Concentration (1 Column) */}
-          <Card className="border-border/80 bg-card shadow-sm flex flex-col justify-between">
-            <CardHeader className="pb-3 flex flex-row items-center justify-between">
+          <Card className="border border-border/70 bg-surface/90 shadow-sm panel-ambient-glow panel-ambient-violet flex flex-col justify-between relative overflow-hidden">
+            <CardHeader className="pb-3 flex flex-row items-center justify-between relative z-10">
               <div>
                 <CardTitle className="text-base font-semibold flex items-center gap-2 text-foreground">
                   <Users className="w-4 h-4 text-primary" />
@@ -1115,7 +1175,7 @@ export default function Dashboard() {
                 CRM <ArrowUpRight className="w-3.5 h-3.5" />
               </Button>
             </CardHeader>
-            <CardContent className="space-y-3.5">
+            <CardContent className="space-y-3.5 relative z-10 flex-1">
               {stats.topClients.length === 0 ? (
                 <div className="text-center py-8">
                   <Users className="w-8 h-8 text-muted-foreground/30 mx-auto mb-2" />
@@ -1123,10 +1183,10 @@ export default function Dashboard() {
                 </div>
               ) : (
                 stats.topClients.map((client, index) => (
-                  <div key={client.id} className="space-y-1.5 p-2 rounded-lg border border-border/40 bg-muted/15">
+                  <div key={client.id} className="space-y-1.5 p-2 rounded-xl border border-border/40 bg-surface-elevated/30 hover:bg-surface-elevated/60 transition-colors">
                     <div className="flex items-center justify-between text-xs">
                       <div className="flex items-center gap-2 min-w-0">
-                        <span className="w-4 h-4 rounded text-[10px] font-bold flex items-center justify-center bg-muted text-muted-foreground shrink-0 border">
+                        <span className="w-4 h-4 rounded text-[10px] font-bold flex items-center justify-center bg-muted/60 text-muted-foreground shrink-0 border border-border/50">
                           {index + 1}
                         </span>
                         <span className="font-semibold text-foreground truncate">{client.name}</span>

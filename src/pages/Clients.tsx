@@ -954,8 +954,8 @@ export default function Clients() {
             <CardContent className="p-0">
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[700px] text-left border-collapse text-xs">
-                  <thead>
-                    <tr className="border-b bg-muted/50 text-muted-foreground font-semibold">
+                  <thead className="table-header-gradient-border">
+                    <tr className="table-header-gradient-border border-b bg-muted/50 text-muted-foreground font-semibold">
                       <th className="p-3 w-10 text-center">
                         <Checkbox
                           checked={selectedClientIds.length === filteredClients.length && filteredClients.length > 0}
@@ -1431,8 +1431,8 @@ export default function Clients() {
                 ) : (
                   <div className="overflow-x-auto border rounded-lg max-h-80">
                     <table className="w-full text-left border-collapse text-xs">
-                      <thead>
-                        <tr className="border-b bg-muted/60 text-muted-foreground font-semibold">
+                      <thead className="table-header-gradient-border">
+                        <tr className="table-header-gradient-border border-b bg-muted/60 text-muted-foreground font-semibold">
                           <th className="p-2.5">Reference</th>
                           <th className="p-2.5">Method</th>
                           <th className="p-2.5">Tx ID</th>

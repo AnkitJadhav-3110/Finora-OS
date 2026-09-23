@@ -415,8 +415,8 @@ export default function InvoiceHistory() {
         <div className="border border-border rounded-2xl overflow-hidden shadow-card bg-card">
           <div className="overflow-x-auto">
             <Table className="min-w-[680px]">
-              <TableHeader>
-                <TableRow className="bg-muted/50">
+              <TableHeader className="table-header-gradient-border">
+                <TableRow className="bg-muted/50 table-header-gradient-border">
                   <TableHead className="w-[44px]">
                     <Checkbox checked={allPageSelected} onCheckedChange={toggleSelectAll} aria-label="Select all" />
                   </TableHead>

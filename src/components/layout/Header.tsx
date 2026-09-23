@@ -227,7 +227,7 @@ export function Header({ onMenuToggle }: HeaderProps) {
   };
 
   return (
-    <header className="h-16 border-b border-border bg-surface/90 backdrop-blur-md sticky top-0 z-30 transition-colors">
+    <header className="h-16 border-b border-border/70 bg-surface/80 backdrop-blur-xl sticky top-0 z-30 transition-colors">
       <div className="h-full px-4 sm:px-6 flex items-center justify-between gap-4">
         {/* Left Side: Mobile Menu + Context-Aware Breadcrumbs */}
         <div className="flex items-center gap-3 min-w-0">

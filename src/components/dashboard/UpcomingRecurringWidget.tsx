@@ -38,8 +38,8 @@ export function UpcomingRecurringWidget() {
   };
 
   return (
-    <Card className="shadow-card border-border/80 bg-card">
-      <CardHeader className="flex flex-row items-center justify-between pb-3">
+    <Card className="shadow-card border border-border/70 bg-surface/90 panel-ambient-glow panel-ambient-primary relative overflow-hidden">
+      <CardHeader className="flex flex-row items-center justify-between pb-3 relative z-10">
         <div>
           <CardTitle className="text-sm font-semibold flex items-center gap-2 text-foreground">
             <RefreshCw className="w-4 h-4 text-primary" />
@@ -51,7 +51,7 @@ export function UpcomingRecurringWidget() {
           View all <ArrowUpRight className="w-3.5 h-3.5" />
         </Button>
       </CardHeader>
-      <CardContent>
+      <CardContent className="relative z-10">
         <div className="space-y-2.5">
           {upcoming.length === 0 ? (
             <div className="text-center py-8">

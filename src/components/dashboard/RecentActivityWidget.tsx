@@ -87,8 +87,8 @@ export function RecentActivityWidget() {
   };
 
   return (
-    <Card className="shadow-card border-border/80 bg-card">
-      <CardHeader className="flex flex-row items-center justify-between pb-3">
+    <Card className="shadow-card border border-border/70 bg-surface/90 panel-ambient-glow panel-ambient-cyan relative overflow-hidden">
+      <CardHeader className="flex flex-row items-center justify-between pb-3 relative z-10">
         <div>
           <CardTitle className="text-sm font-semibold flex items-center gap-2 text-foreground">
             <Activity className="w-4 h-4 text-primary" />
@@ -97,7 +97,7 @@ export function RecentActivityWidget() {
           <p className="text-xs text-muted-foreground mt-0.5">Audit log of invoicing and collection events</p>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="relative z-10">
         <div className="space-y-2.5">
           {activities.length === 0 ? (
             <div className="text-center py-8">

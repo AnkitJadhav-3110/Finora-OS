@@ -487,10 +487,10 @@ export default function TemplateEditor() {
                   variant="outline"
                   size="sm"
                   onClick={() => navigate(`/invoices/create?template=${editingTemplateId}`)}
-                  className="gap-1.5 border-indigo-200 text-indigo-700 hover:bg-indigo-50"
+                  className="gap-1.5"
                   type="button"
                 >
-                  <FileText className="w-4 h-4 text-indigo-600" />
+                  <FileText className="w-3.5 h-3.5" />
                   Use in Invoice
                 </Button>
               )}
@@ -502,24 +502,25 @@ export default function TemplateEditor() {
                   className="gap-1.5"
                   type="button"
                 >
-                  <Download className="w-4 h-4" />
+                  <Download className="w-3.5 h-3.5" />
                   Test PDF
                 </Button>
               )}
               <Button
                 onClick={handleSave}
                 disabled={!validation.ok || !templateName || !backgroundImage || isSaving}
-                className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white"
+                className="gap-2"
+                size="sm"
                 type="button"
               >
                 {isSaving ? (
                   <>
-                    <RefreshCw className="w-4 h-4 animate-spin" />
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin" />
                     Saving...
                   </>
                 ) : (
                   <>
-                    <Save className="w-4 h-4" />
+                    <Save className="w-3.5 h-3.5" />
                     {editingTemplateId ? 'Update Template' : 'Save Template'}
                   </>
                 )}

@@ -5,16 +5,17 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-semibold ring-offset-background transition-all duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 select-none",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-semibold ring-offset-background transition-all duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none disabled:brightness-100 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 select-none",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm hover:shadow",
-        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-sm",
-        outline: "border border-input bg-background hover:bg-accent hover:text-accent-foreground shadow-sm",
-        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80 shadow-sm",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
+        default: "gradient-primary text-white shadow-sm hover:brightness-110 hover:shadow-[0_0_20px_-3px_rgba(91,140,255,0.4)] border border-white/10",
+        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90 hover:shadow-[0_0_18px_-3px_rgba(255,92,112,0.4)] shadow-sm",
+        outline: "border border-border/80 bg-surface/50 hover:bg-surface hover:text-foreground hover:border-border text-muted-foreground shadow-xs",
+        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80 border border-border/60 shadow-xs",
+        ghost: "hover:bg-accent hover:text-accent-foreground text-muted-foreground",
         link: "text-primary underline-offset-4 hover:underline active:scale-100",
+        cyan: "gradient-cyan text-slate-950 hover:brightness-105 hover:shadow-[0_0_20px_-3px_rgba(67,217,255,0.4)] shadow-sm",
       },
       size: {
         default: "h-10 px-4 py-2",

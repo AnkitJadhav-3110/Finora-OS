@@ -448,10 +448,10 @@ export default function EnterpriseHub() {
         </div>
       )}
 
-      <div className="space-y-6 animate-slide-up max-w-7xl mx-auto px-4 md:px-0">
+      <div className="space-y-6 animate-slide-up">
         <PageHeader
           title="Enterprise Control Center"
-          description="Global administrative panel for commercial monitoring, multi-tenant white labeling, REST gateways, security controls, and health verification."
+          description="Global administrative panel for commercial monitoring, multi-tenant white labeling, REST gateways, security controls, and health verification"
         />
 
         {/* Tab Buttons */}
@@ -605,8 +605,8 @@ export default function EnterpriseHub() {
               <CardContent className="p-0">
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm border-t border-border">
-                    <thead>
-                      <tr className="bg-muted/40 text-muted-foreground text-left font-medium border-b border-border">
+                    <thead className="table-header-gradient-border">
+                      <tr className="table-header-gradient-border bg-muted/40 text-muted-foreground text-left font-medium border-b border-border">
                         <th className="p-4">Business Name</th>
                         <th className="p-4">Plan / Billing</th>
                         <th className="p-4">Storage Used</th>
@@ -1194,8 +1194,8 @@ export default function EnterpriseHub() {
                 <CardContent className="p-0">
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm border-t border-border">
-                      <thead>
-                        <tr className="bg-muted/40 text-muted-foreground text-left font-medium border-b border-border">
+                      <thead className="table-header-gradient-border">
+                        <tr className="table-header-gradient-border bg-muted/40 text-muted-foreground text-left font-medium border-b border-border">
                           <th className="p-4">Filename</th>
                           <th className="p-4">File Size</th>
                           <th className="p-4">Virus Scan Result</th>
@@ -1372,8 +1372,8 @@ export default function EnterpriseHub() {
               <CardContent className="p-0">
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm border-t border-border">
-                    <thead>
-                      <tr className="bg-muted/40 text-muted-foreground text-left font-medium border-b border-border">
+                    <thead className="table-header-gradient-border">
+                      <tr className="table-header-gradient-border bg-muted/40 text-muted-foreground text-left font-medium border-b border-border">
                         <th className="p-4">Test Specification</th>
                         <th className="p-4">Type</th>
                         <th className="p-4 text-right">Execution status</th>

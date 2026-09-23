@@ -1,7 +1,25 @@
+import * as React from "react";
 import { cn } from "@/lib/utils";
 
-function Skeleton({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn("animate-pulse rounded-md bg-muted", className)} {...props} />;
+interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
+  variant?: 'default' | 'card' | 'text' | 'circle' | 'button';
+}
+
+function Skeleton({ className, variant = 'default', ...props }: SkeletonProps) {
+  return (
+    <div
+      className={cn(
+        "skeleton-finora relative overflow-hidden transition-all duration-300",
+        variant === 'circle' && "rounded-full",
+        variant === 'text' && "h-4 rounded-md",
+        variant === 'button' && "h-9 rounded-xl",
+        variant === 'card' && "rounded-xl border border-border/40",
+        variant === 'default' && "rounded-lg border border-border/30",
+        className
+      )}
+      {...props}
+    />
+  );
 }
 
 export { Skeleton };

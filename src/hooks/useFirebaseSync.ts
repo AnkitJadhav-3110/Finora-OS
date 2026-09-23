@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useState } from 'react';
 import { 
   collection, 
   doc, 
@@ -19,11 +19,16 @@ import type { Business, Client, Invoice, RecurringSchedule, AppSettings, Invoice
 
 export function useFirebaseSync() {
   const { user } = useAuth();
+  const [loading, setLoading] = useState(true);
 
   const loadData = useCallback(async () => {
-    if (!user || useStore.getState().isDemoMode) return;
+    if (!user || useStore.getState().isDemoMode) {
+      setLoading(false);
+      return;
+    }
 
     try {
+      setLoading(true);
       // 1. Fetch Organization memberships
       const membersRef = collection(db, 'organization_members');
       const q = query(membersRef, where('userId', '==', user.uid));
@@ -535,6 +540,8 @@ export function useFirebaseSync() {
       } else {
         console.error('Error loading data from Firestore:', err);
       }
+    } finally {
+      setLoading(false);
     }
   }, [user]);
 
@@ -852,7 +859,7 @@ export function useFirebaseSync() {
     };
   }, []);
 
-  return { reload: loadData };
+  return { reload: loadData, loading };
 }
 
 // ─── FIRESTORE CRUD ACTIONS ──────────────────────────────

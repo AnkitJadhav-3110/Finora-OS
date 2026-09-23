@@ -82,7 +82,32 @@ export function AppLayout() {
   const isUnhealthy = healthResult?.overallStatus === 'unhealthy';
 
   return (
-    <div className="min-h-screen flex w-full bg-background">
+    <div className="min-h-screen flex w-full bg-background relative overflow-x-hidden selection:bg-primary/20 selection:text-primary">
+      {/* Finora Luminous Ambient Background Glow */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-0 z-0 overflow-hidden opacity-100 transition-opacity duration-500"
+      >
+        <div
+          className="absolute -top-[20%] -left-[10%] w-[60vw] h-[60vw] rounded-full blur-[120px] pointer-events-none opacity-40 dark:opacity-20"
+          style={{
+            background: 'radial-gradient(circle, rgba(91, 140, 255, 0.18) 0%, transparent 70%)'
+          }}
+        />
+        <div
+          className="absolute top-[30%] -right-[15%] w-[55vw] h-[55vw] rounded-full blur-[140px] pointer-events-none opacity-30 dark:opacity-15"
+          style={{
+            background: 'radial-gradient(circle, rgba(139, 124, 255, 0.14) 0%, transparent 70%)'
+          }}
+        />
+        <div
+          className="absolute -bottom-[20%] left-[20%] w-[50vw] h-[50vw] rounded-full blur-[130px] pointer-events-none opacity-20 dark:opacity-10"
+          style={{
+            background: 'radial-gradient(circle, rgba(67, 217, 255, 0.12) 0%, transparent 70%)'
+          }}
+        />
+      </div>
+
       <CommandPalette />
       <Sidebar 
         collapsed={sidebarCollapsed} 
@@ -91,7 +116,7 @@ export function AppLayout() {
         onMobileClose={() => setMobileMenuOpen(false)}
       />
       <div className={cn(
-        "flex-1 flex flex-col min-h-screen transition-all duration-300",
+        "flex-1 flex flex-col min-h-screen transition-all duration-300 relative z-10",
         // Desktop margin
         "lg:ml-64",
         sidebarCollapsed && "lg:ml-[68px]"

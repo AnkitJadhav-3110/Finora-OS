@@ -1,5 +1,6 @@
 import { Helmet } from 'react-helmet-async';
 import { useState, useMemo } from 'react';
+import { cn } from '@/lib/utils';
 import { PageHeader } from '@/components/ui/page-header';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -298,9 +299,10 @@ export default function BusinessTools() {
     
     const clientName = client ? client.name : 'Valued Customer';
     const invoiceNum = invoice ? invoice.invoiceNumber : 'INV-2026-001';
-    const amtStr = invoice ? `${store.settings.currencySymbol}${invoice.total.toLocaleString()}` : '$1,500.00';
+    const amtStr = invoice ? `${store.settings?.currencySymbol || '$'}${invoice.total.toLocaleString()}` : '$1,500.00';
     const dueDate = invoice ? invoice.dueDate : '2026-07-15';
-    const bName = store.settings.organizationName || 'Finora LLC';
+    const bName = store.settings?.organizationName || 'Finora LLC';
+    const portalUrl = store.settings?.portalUrl || 'http://portal.example.com';
 
     return {
       email: `Subject: Action Required: Payment Reminder for Outstanding Balance (${invoiceNum})
@@ -312,7 +314,7 @@ This is a formal payment notice that outstanding Invoice ${invoiceNum} is curren
 Details:
 • Outstanding Total: ${amtStr}
 • Core Due Date: ${dueDate}
-• Settlement Portal: ${store.settings.portalUrl || 'http://portal.example.com'}
+• Settlement Portal: ${portalUrl}
 
 Please wire the funds to our primary corporate bank account or pay securely via the portal link. If payment has already been disbursed, please forward the receipt to our central ledger.
 
@@ -320,7 +322,7 @@ Thank you,
 Corporate Billings Manager
 ${bName}`,
 
-      sms: `Payment Reminder: Invoice ${invoiceNum} of ${amtStr} from ${bName} is due on ${dueDate}. Pay securely here: ${store.settings.portalUrl || 'http://portal.example.com'}. Thank you!`,
+      sms: `Payment Reminder: Invoice ${invoiceNum} of ${amtStr} from ${bName} is due on ${dueDate}. Pay securely here: ${portalUrl}. Thank you!`,
 
       whatsapp: `*PAYMENT REMINDER | ${bName.toUpperCase()}*
 
@@ -330,7 +332,7 @@ This is a rule-based notification regarding Invoice *${invoiceNum}*.
 
 *Outstanding Balance:* ${amtStr}
 *Due Date:* ${dueDate}
-*Secure Payment Link:* ${store.settings.portalUrl || 'http://portal.example.com'}
+*Secure Payment Link:* ${portalUrl}
 
 Please check your Document Vault if you require a fresh copy of the contract or tax invoice breakdown. If you have any inquiries, feel free to reply directly here.`
     };
@@ -365,72 +367,124 @@ Please check your Document Vault if you require a fresh copy of the contract or 
         <meta name="description" content="Generate instant, compliant invoice descriptions and payment notifications with smart deterministic helpers." />
       </Helmet>
 
-      <div className="container mx-auto p-6 space-y-6 max-w-7xl animate-slide-up">
+      <div className="space-y-6 animate-slide-up">
         <PageHeader
           title="Smart Automation Workbench"
-          description="Access rule-based invoice description builders, terms generators, and custom multichannel payment reminders."
+          description="Access rule-based invoice description builders, terms generators, and custom multichannel payment reminders"
         />
 
+        {/* Tools Summary Row */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5">
+          <Card className="shadow-sm border-border/80">
+            <CardContent className="p-3.5 flex items-center gap-3">
+              <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                <Sparkles className="w-4.5 h-4.5" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Item Descriptions</p>
+                <p className="text-sm font-semibold text-foreground tracking-tight">4 Blueprint Presets</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="shadow-sm border-border/80">
+            <CardContent className="p-3.5 flex items-center gap-3">
+              <div className="w-9 h-9 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-600 shrink-0">
+                <Bell className="w-4.5 h-4.5" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Reminder Engine</p>
+                <p className="text-sm font-semibold text-foreground tracking-tight">Email / SMS / WhatsApp</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="shadow-sm border-border/80">
+            <CardContent className="p-3.5 flex items-center gap-3">
+              <div className="w-9 h-9 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-600 shrink-0">
+                <Shield className="w-4.5 h-4.5" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Legal Framework</p>
+                <p className="text-sm font-semibold text-foreground tracking-tight">4 Clauses & T&Cs</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="shadow-sm border-border/80">
+            <CardContent className="p-3.5 flex items-center gap-3">
+              <div className="w-9 h-9 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-600 shrink-0">
+                <Mail className="w-4.5 h-4.5" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Outreach Templates</p>
+                <p className="text-sm font-semibold text-foreground tracking-tight">{emailTemplates.length} Email Workflows</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
         <Tabs defaultValue="desc_builder" className="space-y-6">
-          <TabsList className="bg-muted p-1 border border-border rounded-xl flex flex-wrap gap-1 w-full sm:w-fit">
-            <TabsTrigger value="desc_builder" className="flex items-center gap-1.5">
-              <Sparkles className="w-4 h-4 text-primary animate-pulse" />
+          <TabsList className="bg-muted p-1 border border-border/80 rounded-lg flex flex-wrap gap-1 w-full sm:w-fit">
+            <TabsTrigger value="desc_builder" className="flex items-center gap-1.5 text-xs font-medium">
+              <Sparkles className="w-3.5 h-3.5 text-primary" />
               Smart Description Builder
             </TabsTrigger>
-            <TabsTrigger value="reminders" className="flex items-center gap-1.5">
-              <Bell className="w-4 h-4 text-emerald-500" />
-              Smart Reminder Engine
+            <TabsTrigger value="reminders" className="flex items-center gap-1.5 text-xs font-medium">
+              <Bell className="w-3.5 h-3.5 text-emerald-500" />
+              Payment Reminder Engine
             </TabsTrigger>
-            <TabsTrigger value="terms" className="flex items-center gap-1.5">
-              <Shield className="w-4 h-4" />
+            <TabsTrigger value="terms" className="flex items-center gap-1.5 text-xs font-medium">
+              <Shield className="w-3.5 h-3.5" />
               Terms & Conditions
             </TabsTrigger>
-            <TabsTrigger value="emails" className="flex items-center gap-1.5">
-              <Mail className="w-4 h-4" />
+            <TabsTrigger value="emails" className="flex items-center gap-1.5 text-xs font-medium">
+              <Mail className="w-3.5 h-3.5" />
               Email Templates
             </TabsTrigger>
           </TabsList>
 
           {/* ─── TAB 1: SMART DESCRIPTION BUILDER (MODULE 5) ───────────────── */}
           <TabsContent value="desc_builder" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
               {/* Form Variables */}
-              <div className="space-y-4">
-                <Card className="shadow-sm border border-border">
-                  <CardHeader>
-                    <CardTitle className="text-base font-semibold flex items-center gap-1.5">
-                      <Sparkles className="w-4.5 h-4.5 text-primary" />
-                      Dynamic template selection
+              <div className="lg:col-span-6 space-y-4">
+                <Card className="shadow-sm border border-border/80">
+                  <CardHeader className="pb-3 border-b border-border/60">
+                    <CardTitle className="text-sm font-semibold flex items-center gap-1.5">
+                      <Sparkles className="w-4 h-4 text-primary" />
+                      Dynamic Template Variables
                     </CardTitle>
-                    <CardDescription>Select a rule-based scenario and input the corresponding variables.</CardDescription>
+                    <CardDescription className="text-xs">
+                      Choose an engagement blueprint and fill parameter values to construct professional billing line items.
+                    </CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-4">
+                  <CardContent className="space-y-4 pt-4">
                     <div className="space-y-1.5">
-                      <label className="text-xs font-semibold text-foreground">Select Builder Template</label>
+                      <label className="text-xs font-semibold text-foreground">Select Preset Type</label>
                       <Select value={activeDescTemplateId} onValueChange={setActiveDescTemplateId}>
-                        <SelectTrigger className="bg-card border-border">
+                        <SelectTrigger className="bg-card border-border h-9 text-xs">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
                           {DESCRIPTION_TEMPLATES.map(t => (
-                            <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>
+                            <SelectItem key={t.id} value={t.id} className="text-xs">{t.name}</SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
                     </div>
 
-                    <div className="border-t border-border pt-4 mt-4">
-                      <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3">Template Variables</h4>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    <div className="pt-2">
+                      <h4 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-3">Variable Fields</h4>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         {activeDescTemplate.vars.map(v => (
                           <div key={v} className="space-y-1">
-                            <label className="text-[10px] font-semibold text-muted-foreground uppercase">{v.replace('_', ' ')}</label>
+                            <label className="text-[10px] font-semibold text-muted-foreground uppercase">{v.replace(/_/g, ' ')}</label>
                             <Input
                               value={descVarValues[v] || ''}
                               onChange={(e) => handleDescVarChange(v, e.target.value)}
-                              placeholder={`Enter ${v.toLowerCase().replace('_', ' ')}`}
-                              className="bg-card border-border h-9 text-xs"
+                              placeholder={`Enter ${v.toLowerCase().replace(/_/g, ' ')}`}
+                              className="bg-card border-border h-8 text-xs"
                             />
                           </div>
                         ))}
@@ -441,24 +495,37 @@ Please check your Document Vault if you require a fresh copy of the contract or 
               </div>
 
               {/* Real-time Compiled Output */}
-              <div className="space-y-4">
-                <Card className="shadow-sm border border-border bg-gradient-to-br from-primary/5 to-transparent">
-                  <CardHeader>
-                    <CardTitle className="text-base font-semibold flex items-center justify-between">
-                      <span>Compiled Line-Item Description</span>
-                      <Badge variant="outline" className="bg-primary/10 text-primary border-primary/25">Deterministic</Badge>
-                    </CardTitle>
-                    <CardDescription>This compiled text is formatted and ready to copy directly into your invoices.</CardDescription>
+              <div className="lg:col-span-6 space-y-4">
+                <Card className="shadow-sm border border-border/80 bg-card">
+                  <CardHeader className="pb-3 border-b border-border/60 flex flex-row items-center justify-between">
+                    <div>
+                      <CardTitle className="text-sm font-semibold">Compiled Line-Item Description</CardTitle>
+                      <CardDescription className="text-xs">Formatted output ready to insert directly into invoices</CardDescription>
+                    </div>
+                    <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 text-[10px]">
+                      Deterministic
+                    </Badge>
                   </CardHeader>
-                  <CardContent className="space-y-4">
+                  <CardContent className="pt-4 space-y-3.5">
                     <Textarea
                       value={compiledDescription}
                       readOnly
-                      className="min-h-[160px] font-sans text-sm bg-card border-border border-2 font-medium leading-relaxed"
+                      rows={7}
+                      className="font-sans text-xs bg-muted/20 border-border/80 font-medium leading-relaxed resize-none"
                     />
-                    <Button onClick={() => handleCopy(compiledDescription, 'Compiled Description')} className="w-full sm:w-auto shadow-md">
-                      <Copy className="w-4 h-4 mr-1.5" /> Copy Description Text
-                    </Button>
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] text-muted-foreground">
+                        {compiledDescription.length} characters • {compiledDescription.split(/\s+/).filter(Boolean).length} words
+                      </span>
+                      <Button
+                        size="sm"
+                        onClick={() => handleCopy(compiledDescription, 'Compiled Description')}
+                        className="gap-1.5"
+                      >
+                        <Copy className="w-3.5 h-3.5" />
+                        Copy Description
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
               </div>
@@ -467,47 +534,49 @@ Please check your Document Vault if you require a fresh copy of the contract or 
 
           {/* ─── TAB 2: SMART PAYMENT REMINDER SYSTEM (MODULE 6) ───────────── */}
           <TabsContent value="reminders" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
               {/* Reminder Rules setup */}
-              <div className="space-y-4">
-                <Card className="shadow-sm border border-border">
-                  <CardHeader>
-                    <CardTitle className="text-base font-semibold flex items-center gap-1.5">
-                      <Bell className="w-4.5 h-4.5 text-emerald-500 animate-bounce" />
-                      Add Smart Reminder Rule
+              <div className="lg:col-span-6 space-y-4">
+                <Card className="shadow-sm border border-border/80">
+                  <CardHeader className="pb-3 border-b border-border/60">
+                    <CardTitle className="text-sm font-semibold flex items-center gap-1.5">
+                      <Bell className="w-4 h-4 text-emerald-500" />
+                      Configure Smart Reminder Rule
                     </CardTitle>
-                    <CardDescription>Schedule deterministic automated follow-ups to notify clients via multichannels.</CardDescription>
+                    <CardDescription className="text-xs">
+                      Schedule automated multichannel notifications based on payment due dates
+                    </CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      
+                  <CardContent className="space-y-4 pt-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                       <div className="space-y-1.5">
-                        <label className="text-xs font-semibold text-foreground">1. Select Target Client</label>
+                        <label className="text-xs font-semibold text-foreground">1. Target Client</label>
                         <Select value={selectedClientId} onValueChange={setSelectedClientId}>
-                          <SelectTrigger className="bg-card border-border">
+                          <SelectTrigger className="bg-card border-border h-9 text-xs">
                             <SelectValue placeholder="Choose Client" />
                           </SelectTrigger>
                           <SelectContent>
                             {clients.map(c => (
-                              <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                              <SelectItem key={c.id} value={c.id} className="text-xs">{c.name}</SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
                       </div>
 
                       <div className="space-y-1.5">
-                        <label className="text-xs font-semibold text-foreground">2. Select Invoice</label>
+                        <label className="text-xs font-semibold text-foreground">2. Target Invoice</label>
                         <Select value={selectedInvoiceId} onValueChange={setSelectedInvoiceId} disabled={!selectedClientId}>
-                          <SelectTrigger className="bg-card border-border">
+                          <SelectTrigger className="bg-card border-border h-9 text-xs">
                             <SelectValue placeholder={selectedClientId ? "Select active invoice" : "Select client first"} />
                           </SelectTrigger>
                           <SelectContent>
                             {clientInvoices.length === 0 ? (
-                              <SelectItem value="none">No unpaid invoices</SelectItem>
+                              <SelectItem value="none" className="text-xs">No invoices found</SelectItem>
                             ) : (
                               clientInvoices.map(i => (
-                                <SelectItem key={i.id} value={i.id}>{i.invoiceNumber} ({store.settings.currencySymbol}{i.total.toLocaleString()})</SelectItem>
+                                <SelectItem key={i.id} value={i.id} className="text-xs">
+                                  {i.invoiceNumber} ({store.settings.currencySymbol}{i.total.toLocaleString()})
+                                </SelectItem>
                               ))
                             )}
                           </SelectContent>
@@ -515,101 +584,107 @@ Please check your Document Vault if you require a fresh copy of the contract or 
                       </div>
 
                       <div className="space-y-1.5">
-                        <label className="text-xs font-semibold text-foreground">3. Timing Interval</label>
+                        <label className="text-xs font-semibold text-foreground">3. Schedule Offset</label>
                         <div className="flex gap-2">
                           <Input
                             type="number"
                             value={reminderRuleDays}
                             onChange={(e) => setReminderRuleDays(e.target.value)}
-                            className="w-16 text-center bg-card border-border h-9"
+                            className="w-16 text-center bg-card border-border h-9 text-xs"
                           />
                           <Select value={reminderTiming} onValueChange={(val: any) => setReminderTiming(val)}>
-                            <SelectTrigger className="flex-1 bg-card border-border h-9">
+                            <SelectTrigger className="flex-1 bg-card border-border h-9 text-xs">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="before">Days Before Due Date</SelectItem>
-                              <SelectItem value="after">Days After Due Date</SelectItem>
-                              <SelectItem value="on_day">On the Due Date</SelectItem>
+                              <SelectItem value="before" className="text-xs">Days Before Due Date</SelectItem>
+                              <SelectItem value="after" className="text-xs">Days After Due Date</SelectItem>
+                              <SelectItem value="on_day" className="text-xs">On the Due Date</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
                       </div>
 
                       <div className="space-y-1.5">
-                        <label className="text-xs font-semibold text-foreground">4. Notification Channel</label>
+                        <label className="text-xs font-semibold text-foreground">4. Preferred Channel</label>
                         <Select value={selectedChannel} onValueChange={(val: any) => setSelectedChannel(val)}>
-                          <SelectTrigger className="bg-card border-border">
+                          <SelectTrigger className="bg-card border-border h-9 text-xs">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="email">Corporate Email Link</SelectItem>
-                            <SelectItem value="sms">SMS Text Alert</SelectItem>
-                            <SelectItem value="whatsapp">WhatsApp Business Notice</SelectItem>
+                            <SelectItem value="email" className="text-xs">Corporate Email Dispatch</SelectItem>
+                            <SelectItem value="sms" className="text-xs">SMS Text Alert</SelectItem>
+                            <SelectItem value="whatsapp" className="text-xs">WhatsApp Direct Alert</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
                     </div>
 
-                    <Button onClick={handleSaveReminderRule} className="w-full mt-4 bg-emerald-600 hover:bg-emerald-700 shadow-md">
-                      <Plus className="w-4 h-4 mr-1" />
-                      Save & Schedule Smart Rule
+                    <Button onClick={handleSaveReminderRule} size="sm" className="w-full gap-1.5 mt-2">
+                      <Plus className="w-3.5 h-3.5" />
+                      Save & Register Automation Rule
                     </Button>
                   </CardContent>
                 </Card>
               </div>
 
               {/* Multi-channel message output */}
-              <div className="space-y-4">
-                <Card className="shadow-sm border border-border">
-                  <CardHeader className="pb-3 border-b border-border">
-                    <CardTitle className="text-base font-semibold flex items-center justify-between">
-                      <span>Message Template Previews</span>
-                      <div className="flex gap-1">
+              <div className="lg:col-span-6 space-y-4">
+                <Card className="shadow-sm border border-border/80">
+                  <CardHeader className="pb-3 border-b border-border/60">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-sm font-semibold">Message Template Preview</CardTitle>
+                      <div className="flex gap-1 bg-muted p-0.5 rounded-lg border border-border/60">
                         <Button 
-                          variant={selectedChannel === 'email' ? 'default' : 'outline'} 
-                          size="xs" 
-                          className="h-7 text-xs"
+                          variant={selectedChannel === 'email' ? 'secondary' : 'ghost'} 
+                          size="sm" 
+                          className="h-6.5 px-2 text-[11px] gap-1"
                           onClick={() => setSelectedChannel('email')}
                         >
-                          <Mail className="w-3.5 h-3.5 mr-1" /> Email
+                          <Mail className="w-3 h-3" /> Email
                         </Button>
                         <Button 
-                          variant={selectedChannel === 'sms' ? 'default' : 'outline'} 
-                          size="xs" 
-                          className="h-7 text-xs"
+                          variant={selectedChannel === 'sms' ? 'secondary' : 'ghost'} 
+                          size="sm" 
+                          className="h-6.5 px-2 text-[11px] gap-1"
                           onClick={() => setSelectedChannel('sms')}
                         >
-                          <Smartphone className="w-3.5 h-3.5 mr-1" /> SMS
+                          <Smartphone className="w-3 h-3" /> SMS
                         </Button>
                         <Button 
-                          variant={selectedChannel === 'whatsapp' ? 'default' : 'outline'} 
-                          size="xs" 
-                          className="h-7 text-xs"
+                          variant={selectedChannel === 'whatsapp' ? 'secondary' : 'ghost'} 
+                          size="sm" 
+                          className="h-6.5 px-2 text-[11px] gap-1"
                           onClick={() => setSelectedChannel('whatsapp')}
                         >
-                          <MessageSquare className="w-3.5 h-3.5 mr-1" /> WhatsApp
+                          <MessageSquare className="w-3 h-3" /> WhatsApp
                         </Button>
                       </div>
-                    </CardTitle>
+                    </div>
                   </CardHeader>
-                  <CardContent className="pt-4 space-y-4">
+                  <CardContent className="pt-4 space-y-3.5">
                     {selectedClientId ? (
                       <>
                         <Textarea
                           value={compiledReminderMessages[selectedChannel]}
                           readOnly
-                          className="min-h-[180px] font-mono text-xs bg-card border-border leading-relaxed"
+                          rows={7}
+                          className="font-mono text-xs bg-muted/20 border-border/80 leading-relaxed resize-none"
                         />
-                        <Button onClick={() => handleCopy(compiledReminderMessages[selectedChannel], `${selectedChannel.toUpperCase()} Template`)} className="shadow-md">
-                          <Copy className="w-4 h-4 mr-1.5" /> Copy Message Text
-                        </Button>
+                        <div className="flex items-center justify-between">
+                          <span className="text-[11px] text-muted-foreground uppercase font-mono">
+                            Channel: {selectedChannel}
+                          </span>
+                          <Button size="sm" onClick={() => handleCopy(compiledReminderMessages[selectedChannel], `${selectedChannel.toUpperCase()} Template`)} className="gap-1.5">
+                            <Copy className="w-3.5 h-3.5" /> Copy Message Text
+                          </Button>
+                        </div>
                       </>
                     ) : (
-                      <div className="text-center py-12 text-muted-foreground border border-dashed border-border rounded-xl bg-card">
-                        <Bell className="w-10 h-10 text-muted-foreground/45 mx-auto mb-2" />
-                        <p className="text-xs font-semibold text-foreground">No templates compiled</p>
-                        <p className="text-[10px] mt-0.5">Please select a target client above to generate real variable notifications.</p>
+                      <div className="text-center py-12 text-muted-foreground border border-dashed border-border/80 rounded-lg bg-muted/5">
+                        <Bell className="w-8 h-8 text-muted-foreground/40 mx-auto mb-2" />
+                        <p className="text-xs font-semibold text-foreground">Select a Client to Preview</p>
+                        <p className="text-[11px] text-muted-foreground mt-0.5">Choose a client and invoice on the left to compile live message variables.</p>
                       </div>
                     )}
                   </CardContent>
@@ -620,111 +695,154 @@ Please check your Document Vault if you require a fresh copy of the contract or 
 
           {/* ─── TAB 3: TERMS & CONDITIONS ────────────────────────────── */}
           <TabsContent value="terms" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <h3 className="font-semibold text-sm">Terms & Conditions Templates</h3>
-                {termsTemplates.map(template => (
-                  <Card
-                    key={template.id}
-                    className="cursor-pointer hover:border-primary/50 transition-colors shadow-card"
-                    onClick={() => setSelectedContent(template.content)}
-                  >
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-base flex items-center justify-between">
-                        {template.name}
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleCopy(template.content, template.name);
-                          }}
-                        >
-                          <Copy className="w-4 h-4" />
-                        </Button>
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm text-muted-foreground line-clamp-2">
-                        {template.content.substring(0, 150)}...
-                      </p>
-                    </CardContent>
-                  </Card>
-                ))}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              <div className="lg:col-span-5 space-y-3">
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground px-0.5">Terms & Conditions Presets</h3>
+                <div className="space-y-2.5">
+                  {termsTemplates.map(template => {
+                    const isSelected = selectedContent === template.content;
+                    return (
+                      <Card
+                        key={template.id}
+                        className={cn(
+                          "cursor-pointer transition-all border",
+                          isSelected ? "border-primary ring-1 ring-primary/40 bg-card" : "border-border/70 hover:border-border bg-card"
+                        )}
+                        onClick={() => setSelectedContent(template.content)}
+                      >
+                        <CardHeader className="p-3.5 pb-2">
+                          <CardTitle className="text-xs font-semibold flex items-center justify-between">
+                            <span>{template.name}</span>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7 text-muted-foreground hover:text-foreground"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleCopy(template.content, template.name);
+                              }}
+                            >
+                              <Copy className="w-3.5 h-3.5" />
+                            </Button>
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="p-3.5 pt-0">
+                          <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
+                            {template.content.substring(0, 140)}...
+                          </p>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
               </div>
-              <div>
-                <h3 className="font-semibold text-sm mb-4">Preview & Edit</h3>
-                <Textarea
-                  value={selectedContent}
-                  onChange={(e) => setSelectedContent(e.target.value)}
-                  placeholder="Select a template to preview..."
-                  className="min-h-[400px] font-mono text-sm bg-card border-border"
-                />
-                {selectedContent && (
-                  <Button
-                    className="mt-4 shadow-md"
-                    onClick={() => handleCopy(selectedContent, 'Content')}
-                  >
-                    <Copy className="w-4 h-4 mr-2" />
-                    Copy to Clipboard
-                  </Button>
-                )}
+
+              <div className="lg:col-span-7 space-y-3">
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground px-0.5">Template Preview & Customization</h3>
+                <Card className="shadow-sm border-border/80">
+                  <CardContent className="p-4 space-y-3">
+                    <Textarea
+                      value={selectedContent}
+                      onChange={(e) => setSelectedContent(e.target.value)}
+                      placeholder="Select a template on the left to preview and customize..."
+                      rows={14}
+                      className="font-mono text-xs bg-muted/15 border-border/80 leading-relaxed resize-none"
+                    />
+                    <div className="flex items-center justify-between pt-1">
+                      <span className="text-[11px] text-muted-foreground">
+                        {selectedContent ? `${selectedContent.length} characters` : 'No template loaded'}
+                      </span>
+                      {selectedContent && (
+                        <Button
+                          size="sm"
+                          className="gap-1.5"
+                          onClick={() => handleCopy(selectedContent, 'Content')}
+                        >
+                          <Copy className="w-3.5 h-3.5" />
+                          Copy to Clipboard
+                        </Button>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
             </div>
           </TabsContent>
 
           {/* ─── TAB 4: EMAIL TEMPLATES ────────────────────────────────── */}
           <TabsContent value="emails" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <h3 className="font-semibold text-sm">Email Templates</h3>
-                {emailTemplates.map(template => (
-                  <Card
-                    key={template.id}
-                    className="cursor-pointer hover:border-primary/50 transition-colors shadow-card"
-                    onClick={() => setSelectedContent(`Subject: ${template.subject}\n\n${template.content}`)}
-                  >
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-base flex items-center justify-between">
-                        {template.name}
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleCopy(template.content, template.name);
-                          }}
-                        >
-                          <Copy className="w-4 h-4" />
-                        </Button>
-                      </CardTitle>
-                      <CardDescription className="text-xs">{template.subject}</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm text-muted-foreground line-clamp-2">
-                        {template.content.substring(0, 120)}...
-                      </p>
-                    </CardContent>
-                  </Card>
-                ))}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              <div className="lg:col-span-5 space-y-3">
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground px-0.5">Email Communications</h3>
+                <div className="space-y-2.5">
+                  {emailTemplates.map(template => {
+                    const fullContent = `Subject: ${template.subject}\n\n${template.content}`;
+                    const isSelected = selectedContent === fullContent;
+                    return (
+                      <Card
+                        key={template.id}
+                        className={cn(
+                          "cursor-pointer transition-all border",
+                          isSelected ? "border-primary ring-1 ring-primary/40 bg-card" : "border-border/70 hover:border-border bg-card"
+                        )}
+                        onClick={() => setSelectedContent(fullContent)}
+                      >
+                        <CardHeader className="p-3.5 pb-1.5">
+                          <CardTitle className="text-xs font-semibold flex items-center justify-between">
+                            <span>{template.name}</span>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7 text-muted-foreground hover:text-foreground"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleCopy(template.content, template.name);
+                              }}
+                            >
+                              <Copy className="w-3.5 h-3.5" />
+                            </Button>
+                          </CardTitle>
+                          <CardDescription className="text-[11px] truncate text-muted-foreground">{template.subject}</CardDescription>
+                        </CardHeader>
+                        <CardContent className="p-3.5 pt-1">
+                          <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
+                            {template.content.substring(0, 110)}...
+                          </p>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
               </div>
-              <div>
-                <h3 className="font-semibold text-sm mb-4">Preview & Edit</h3>
-                <Textarea
-                  value={selectedContent}
-                  onChange={(e) => setSelectedContent(e.target.value)}
-                  placeholder="Select a template to preview..."
-                  className="min-h-[400px] font-mono text-sm bg-card border-border"
-                />
-                {selectedContent && (
-                  <Button
-                    className="mt-4 shadow-md"
-                    onClick={() => handleCopy(selectedContent, 'Email')}
-                  >
-                    <Copy className="w-4 h-4 mr-2" />
-                    Copy to Clipboard
-                  </Button>
-                )}
+
+              <div className="lg:col-span-7 space-y-3">
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground px-0.5">Message Inspector & Editor</h3>
+                <Card className="shadow-sm border-border/80">
+                  <CardContent className="p-4 space-y-3">
+                    <Textarea
+                      value={selectedContent}
+                      onChange={(e) => setSelectedContent(e.target.value)}
+                      placeholder="Select an email workflow on the left to inspect or edit..."
+                      rows={14}
+                      className="font-mono text-xs bg-muted/15 border-border/80 leading-relaxed resize-none"
+                    />
+                    <div className="flex items-center justify-between pt-1">
+                      <span className="text-[11px] text-muted-foreground">
+                        {selectedContent ? `${selectedContent.length} characters` : 'No template loaded'}
+                      </span>
+                      {selectedContent && (
+                        <Button
+                          size="sm"
+                          className="gap-1.5"
+                          onClick={() => handleCopy(selectedContent, 'Email Content')}
+                        >
+                          <Copy className="w-3.5 h-3.5" />
+                          Copy to Clipboard
+                        </Button>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
             </div>
           </TabsContent>

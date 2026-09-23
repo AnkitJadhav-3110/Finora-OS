@@ -571,8 +571,8 @@ export default function Expenses() {
       <Card className="shadow-sm overflow-hidden border border-border">
         <div className="overflow-x-auto">
           <Table className="min-w-[760px]">
-          <TableHeader className="bg-muted/50">
-            <TableRow>
+          <TableHeader className="bg-muted/50 table-header-gradient-border">
+            <TableRow className="table-header-gradient-border">
               <TableHead className="w-[120px]">Date</TableHead>
               <TableHead>Vendor</TableHead>
               <TableHead>Category</TableHead>

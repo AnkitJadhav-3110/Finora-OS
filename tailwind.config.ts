@@ -54,10 +54,15 @@ const config: Config = {
           foreground: 'hsl(var(--card-foreground))'
         },
         surface: {
+          deep: 'hsl(var(--surface-deep))',
           DEFAULT: 'hsl(var(--surface))',
           elevated: 'hsl(var(--surface-elevated))',
           hover: 'hsl(var(--surface-hover))',
         },
+        electric: 'hsl(var(--electric-blue))',
+        cyan: 'hsl(var(--cyan))',
+        violet: 'hsl(var(--violet))',
+        indigo: 'hsl(var(--indigo))',
         success: {
           DEFAULT: 'hsl(var(--success))',
           foreground: 'hsl(var(--success-foreground))'

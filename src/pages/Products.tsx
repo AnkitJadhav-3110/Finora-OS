@@ -556,8 +556,8 @@ export default function Products() {
             <CardContent className="p-0">
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse text-xs">
-                  <thead>
-                    <tr className="border-b bg-muted/50 text-muted-foreground font-semibold">
+                  <thead className="table-header-gradient-border">
+                    <tr className="table-header-gradient-border border-b bg-muted/50 text-muted-foreground font-semibold">
                       <th className="p-3 w-10 text-center">Fav</th>
                       <th className="p-3">Item / Service Name</th>
                       <th className="p-3">SKU</th>

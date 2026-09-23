@@ -6,10 +6,11 @@
 
 @layer base {
   :root {
-    /* Base Finora Semantic Tokens (Light) */
+    /* Finora Visual Identity Tokens (Light Theme) */
     --background: 210 40% 98%;          /* #F8FAFC crisp architectural canvas */
     --foreground: 222 47% 11%;          /* #0F172A deep high-contrast text */
 
+    --surface-deep: 210 40% 94%;        /* #EDF2F7 */
     --surface: 0 0% 100%;               /* #FFFFFF primary flat surface */
     --surface-elevated: 210 40% 96%;    /* #F1F5F9 elevated card / dialog */
     --surface-hover: 210 40% 95%;       /* #EDF2F7 hover surface */
@@ -23,6 +24,11 @@
     --primary: 221 83% 53%;             /* Finora Blue #2563EB */
     --primary-foreground: 0 0% 100%;
 
+    --electric-blue: 216 100% 65%;
+    --cyan: 192 95% 48%;
+    --violet: 247 90% 68%;
+    --indigo: 239 84% 67%;
+
     --secondary: 210 40% 96%;
     --secondary-foreground: 222 47% 11%;
 
@@ -35,7 +41,7 @@
     --destructive: 0 84% 58%;           /* Danger Red #DC2626 */
     --destructive-foreground: 0 0% 100%;
 
-    --success: 160 84% 36%;             /* Emerald Success #059669 */
+    --success: 152 76% 40%;             /* Success Emerald #10B981 */
     --success-foreground: 0 0% 100%;
 
     --warning: 38 92% 46%;              /* Amber Warning #D97706 */
@@ -63,6 +69,32 @@
     --sidebar-border: 214 32% 91%;
     --sidebar-ring: 221 83% 53%;
 
+    /* Finora Luminous Gradients */
+    --gradient-primary: linear-gradient(135deg, #5B8CFF 0%, #6366F1 50%, #8B7CFF 100%);
+    --gradient-cyan: linear-gradient(135deg, #43D9FF 0%, #5B8CFF 100%);
+    --gradient-success: linear-gradient(135deg, #32D583 0%, #20B486 100%);
+
+    /* Finora Luminous Ambient Radial Panel Glow Tokens */
+    --ambient-glow-card: radial-gradient(circle at 80% 20%, rgba(91, 140, 255, 0.05) 0%, transparent 65%);
+    --ambient-glow-primary: radial-gradient(circle at 85% 15%, rgba(91, 140, 255, 0.07) 0%, transparent 60%);
+    --ambient-glow-cyan: radial-gradient(circle at 15% 20%, rgba(67, 217, 255, 0.06) 0%, transparent 60%);
+    --ambient-glow-success: radial-gradient(circle at 85% 15%, rgba(50, 213, 131, 0.07) 0%, transparent 60%);
+    --ambient-glow-danger: radial-gradient(circle at 85% 15%, rgba(255, 92, 112, 0.06) 0%, transparent 60%);
+    --ambient-glow-violet: radial-gradient(circle at 85% 15%, rgba(139, 124, 255, 0.07) 0%, transparent 60%);
+
+    /* Finora Shimmer Skeleton Tokens */
+    --skeleton-shimmer-from: rgba(226, 232, 240, 0.55);
+    --skeleton-shimmer-highlight: rgba(91, 140, 255, 0.15);
+    --skeleton-shimmer-gradient: linear-gradient(90deg, var(--skeleton-shimmer-from) 0%, var(--skeleton-shimmer-highlight) 50%, var(--skeleton-shimmer-from) 100%);
+
+    /* Table Header Subtle Linear Gradient Border Tokens */
+    --table-header-border-gradient: linear-gradient(90deg, hsl(var(--border)) 0%, color-mix(in srgb, hsl(var(--border)) 90%, hsl(var(--primary) / 0.10)) 25%, color-mix(in srgb, hsl(var(--border)) 70%, hsl(var(--primary) / 0.10)) 50%, color-mix(in srgb, hsl(var(--border)) 90%, hsl(var(--primary) / 0.10)) 75%, hsl(var(--border)) 100%);
+
+    /* Active Chart Series Glow Tokens (0.15 - 0.20 Opacity) */
+    --chart-glow-primary: drop-shadow(0 4px 10px rgba(91, 140, 255, 0.18));
+    --chart-glow-cyan: drop-shadow(0 4px 10px rgba(67, 217, 255, 0.18));
+    --chart-glow-violet: drop-shadow(0 4px 10px rgba(139, 124, 255, 0.18));
+
     /* Micro-elevations */
     --shadow-xs: 0 1px 2px 0 hsl(222 47% 11% / 0.04);
     --shadow-sm: 0 1px 3px 0 hsl(222 47% 11% / 0.06), 0 1px 2px -1px hsl(222 47% 11% / 0.06);
@@ -70,73 +102,105 @@
     --shadow-lg: 0 10px 15px -3px hsl(222 47% 11% / 0.08), 0 4px 6px -4px hsl(222 47% 11% / 0.04);
     --shadow-card: 0 1px 3px 0 hsl(222 47% 11% / 0.05);
 
-    /* Subtle transitions */
-    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+    /* Motion System */
+    --transition-fast: 180ms cubic-bezier(0.16, 1, 0.3, 1);
+    --transition-base: 250ms cubic-bezier(0.16, 1, 0.3, 1);
+    --transition-emphasis: 380ms cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .dark {
-    /* Base Finora Semantic Tokens (Dark - Refined SaaS OS) */
-    --background: 213 29% 6%;           /* #0B0F14 deep background */
-    --foreground: 210 40% 96%;          /* #F1F5F9 text primary */
+    /* Finora Visual Identity Tokens (Dark - Luminous Financial OS) */
+    --background: 218 36% 4.3%;         /* #070A0F deep application background */
+    --foreground: 214 47% 97.1%;        /* #F4F7FB primary text */
 
-    --surface: 216 31% 10%;             /* #111720 primary surface */
-    --surface-elevated: 215 28% 12%;    /* #161D27 elevated surface */
-    --surface-hover: 218 28% 15%;       /* #1C2432 hover surface */
+    --surface-deep: 215 35% 6.7%;       /* #0B1017 deep surface */
+    --surface: 217 36% 9.8%;            /* #101722 normal content surface */
+    --surface-elevated: 216 32% 12.2%;   /* #151D29 elevated surface */
+    --surface-hover: 217 30% 15%;       /* #17212F hover surface */
 
-    --card: 216 31% 10%;                /* #111720 */
-    --card-foreground: 210 40% 96%;
+    --card: 217 36% 9.8%;               /* #101722 */
+    --card-foreground: 214 47% 97.1%;   /* #F4F7FB */
 
-    --popover: 215 28% 12%;             /* #161D27 */
-    --popover-foreground: 210 40% 96%;
+    --popover: 216 32% 12.2%;          /* #151D29 */
+    --popover-foreground: 214 47% 97.1%;
 
-    --primary: 221 83% 58%;             /* Finora Blue #3B82F6 */
+    --primary: 222 100% 67.8%;          /* Finora Blue #5B8CFF */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 215 28% 13%;
-    --secondary-foreground: 210 40% 96%;
+    --electric-blue: 216 100% 71.6%;   /* #6EA8FF */
+    --cyan: 192 100% 63.1%;             /* #43D9FF */
+    --violet: 247 100% 74.3%;           /* #8B7CFF */
+    --indigo: 239 84% 66.7%;            /* #6366F1 */
 
-    --muted: 215 25% 14%;
-    --muted-foreground: 215 16% 62%;    /* #94A3B8 text secondary/muted */
+    --secondary: 216 32% 13%;           /* #161E2B */
+    --secondary-foreground: 214 47% 97.1%;
 
-    --accent: 215 25% 15%;
-    --accent-foreground: 210 40% 96%;
+    --muted: 217 30% 13%;
+    --muted-foreground: 218 19% 70.8%;  /* #A7B1C2 secondary text */
 
-    --destructive: 0 84% 60%;           /* Danger Red #EF4444 */
+    --accent: 216 32% 14%;
+    --accent-foreground: 214 47% 97.1%;
+
+    --destructive: 353 100% 68%;        /* Danger #FF5C70 */
     --destructive-foreground: 0 0% 100%;
 
-    --success: 160 84% 39%;             /* Emerald Success #10B981 */
-    --success-foreground: 0 0% 100%;
+    --success: 150 65.5% 51.6%;         /* Success #32D583 */
+    --success-foreground: 218 36% 4.3%;
 
-    --warning: 38 92% 50%;              /* Amber Warning #F59E0B */
-    --warning-foreground: 0 0% 100%;
+    --warning: 38 90% 62.7%;            /* Warning #F5B84B */
+    --warning-foreground: 218 36% 4.3%;
 
-    --info: 199 89% 48%;                /* Sky Info #0EA5E9 */
-    --info-foreground: 0 0% 100%;
+    --info: 192 100% 63.1%;             /* Cyan #43D9FF */
+    --info-foreground: 218 36% 4.3%;
 
-    --text-primary: 210 40% 96%;
-    --text-secondary: 215 16% 75%;
-    --text-muted: 215 16% 58%;
+    --text-primary: 214 47% 97.1%;      /* #F4F7FB */
+    --text-secondary: 218 19% 70.8%;    /* #A7B1C2 */
+    --text-muted: 218 13% 46.7%;        /* #687386 */
 
-    --border: 214 23% 18%;              /* #232C38 refined dark borders */
-    --input: 214 23% 18%;               /* #232C38 */
-    --ring: 221 83% 58%;
+    --border: 217 28% 18%;              /* Subtle white/blue alpha border */
+    --input: 217 28% 18%;
+    --ring: 222 100% 67.8%;
 
-    --sidebar-background: 216 31% 10%;  /* #111720 primary surface */
-    --sidebar-foreground: 210 40% 92%;
-    --sidebar-primary: 221 83% 58%;
+    --sidebar-background: 215 35% 6.7%; /* #0B1017 deep surface for sidebar */
+    --sidebar-foreground: 218 19% 70.8%;/* #A7B1C2 */
+    --sidebar-primary: 222 100% 67.8%;  /* #5B8CFF */
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 215 28% 14%;
-    --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 214 23% 18%;      /* #232C38 */
-    --sidebar-ring: 221 83% 58%;
+    --sidebar-accent: 217 36% 12%;
+    --sidebar-accent-foreground: 214 47% 97.1%;
+    --sidebar-border: 217 28% 15%;
+    --sidebar-ring: 222 100% 67.8%;
 
-    --shadow-xs: 0 1px 2px 0 hsl(0 0% 0% / 0.4);
-    --shadow-sm: 0 1px 3px 0 hsl(0 0% 0% / 0.4), 0 1px 2px -1px hsl(0 0% 0% / 0.3);
-    --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.4), 0 2px 4px -2px hsl(0 0% 0% / 0.3);
-    --shadow-lg: 0 10px 15px -3px hsl(0 0% 0% / 0.4), 0 4px 6px -4px hsl(0 0% 0% / 0.3);
-    --shadow-card: 0 1px 3px 0 hsl(0 0% 0% / 0.3);
+    /* Finora Luminous Gradients */
+    --gradient-primary: linear-gradient(135deg, #5B8CFF 0%, #6366F1 50%, #8B7CFF 100%);
+    --gradient-cyan: linear-gradient(135deg, #43D9FF 0%, #5B8CFF 100%);
+    --gradient-success: linear-gradient(135deg, #32D583 0%, #20B486 100%);
+
+    /* Finora Luminous Ambient Radial Panel Glow Tokens (Dark Luminous OS) */
+    --ambient-glow-card: radial-gradient(circle at 80% 20%, rgba(91, 140, 255, 0.08) 0%, transparent 65%);
+    --ambient-glow-primary: radial-gradient(circle at 85% 15%, rgba(91, 140, 255, 0.12) 0%, transparent 60%);
+    --ambient-glow-cyan: radial-gradient(circle at 15% 20%, rgba(67, 217, 255, 0.10) 0%, transparent 60%);
+    --ambient-glow-success: radial-gradient(circle at 85% 15%, rgba(50, 213, 131, 0.11) 0%, transparent 60%);
+    --ambient-glow-danger: radial-gradient(circle at 85% 15%, rgba(255, 92, 112, 0.10) 0%, transparent 60%);
+    --ambient-glow-violet: radial-gradient(circle at 85% 15%, rgba(139, 124, 255, 0.11) 0%, transparent 60%);
+
+    /* Finora Shimmer Skeleton Tokens (Dark OS) */
+    --skeleton-shimmer-from: rgba(16, 23, 34, 0.85);
+    --skeleton-shimmer-highlight: rgba(91, 140, 255, 0.18);
+    --skeleton-shimmer-gradient: linear-gradient(90deg, var(--skeleton-shimmer-from) 0%, var(--skeleton-shimmer-highlight) 50%, var(--skeleton-shimmer-from) 100%);
+
+    /* Table Header Subtle Linear Gradient Border Tokens (Dark OS) */
+    --table-header-border-gradient: linear-gradient(90deg, hsl(var(--border)) 0%, color-mix(in srgb, hsl(var(--border)) 85%, hsl(var(--primary) / 0.10)) 25%, color-mix(in srgb, hsl(var(--border)) 65%, hsl(var(--primary) / 0.10)) 50%, color-mix(in srgb, hsl(var(--border)) 85%, hsl(var(--primary) / 0.10)) 75%, hsl(var(--border)) 100%);
+
+    /* Active Chart Series Glow Tokens (Dark Luminous OS, 0.15 - 0.20 Opacity) */
+    --chart-glow-primary: drop-shadow(0 4px 12px rgba(91, 140, 255, 0.20));
+    --chart-glow-cyan: drop-shadow(0 4px 12px rgba(67, 217, 255, 0.19));
+    --chart-glow-violet: drop-shadow(0 4px 12px rgba(139, 124, 255, 0.19));
+
+    --shadow-xs: 0 1px 2px 0 hsl(0 0% 0% / 0.5);
+    --shadow-sm: 0 1px 3px 0 hsl(0 0% 0% / 0.5), 0 1px 2px -1px hsl(0 0% 0% / 0.4);
+    --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.5), 0 2px 4px -2px hsl(0 0% 0% / 0.4);
+    --shadow-lg: 0 10px 15px -3px hsl(0 0% 0% / 0.5), 0 4px 6px -4px hsl(0 0% 0% / 0.4);
+    --shadow-card: 0 1px 3px 0 hsl(0 0% 0% / 0.4);
   }
 }
 
@@ -164,36 +228,164 @@
     background: var(--gradient-primary);
   }
 
+  .gradient-cyan {
+    background: var(--gradient-cyan);
+  }
+
   .gradient-success {
     background: var(--gradient-success);
   }
 
-  .gradient-warning {
-    background: var(--gradient-warning);
-  }
-
   .gradient-hero {
-    background: var(--gradient-hero);
+    background: radial-gradient(circle at 50% 0%, rgba(91, 140, 255, 0.15) 0%, transparent 70%);
   }
 
-  .gradient-card {
-    background: var(--gradient-card);
+  /* Finora Controlled Ambient Glows */
+  .glow-primary {
+    box-shadow: 0 0 24px -4px rgba(91, 140, 255, 0.35);
   }
 
-  .shadow-glow {
-    box-shadow: var(--shadow-glow);
+  .glow-cyan {
+    box-shadow: 0 0 24px -4px rgba(67, 217, 255, 0.35);
   }
 
-  .shadow-card {
-    box-shadow: var(--shadow-card);
+  .glow-success {
+    box-shadow: 0 0 24px -4px rgba(50, 213, 131, 0.35);
   }
 
+  .glow-danger {
+    box-shadow: 0 0 24px -4px rgba(255, 92, 112, 0.35);
+  }
+
+  .glow-card {
+    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5), 0 0 16px -4px rgba(91, 140, 255, 0.09);
+  }
+
+  /* Controlled Glassmorphism - Level 3 Floating Surfaces */
   .glass {
-    @apply bg-background/80 backdrop-blur-xl border border-border/50;
+    background: rgba(16, 23, 34, 0.72);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
   }
 
   .glass-card {
-    @apply bg-card/80 backdrop-blur-xl border border-border/50 shadow-card;
+    background: rgba(16, 23, 34, 0.78);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.45);
+  }
+
+  /* Selective Gradient Borders - Level 4 Featured Surfaces */
+  .border-gradient-finora {
+    background: linear-gradient(#101722, #101722) padding-box,
+                linear-gradient(135deg, rgba(91, 140, 255, 0.55), rgba(139, 124, 255, 0.35), rgba(67, 217, 255, 0.25)) border-box;
+    border: 1px solid transparent;
+  }
+
+  /* Finora KPI Interactive Card */
+  .kpi-card-finora {
+    transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1),
+                border-color 220ms cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 220ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .kpi-card-finora:hover {
+    transform: translateY(-2px);
+    border-color: rgba(91, 140, 255, 0.35);
+    box-shadow: 0 10px 25px -4px rgba(0, 0, 0, 0.5), 0 0 20px -2px rgba(91, 140, 255, 0.12);
+  }
+
+  /* Finora Ambient Radial Glow Panels */
+  .panel-ambient-glow {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .panel-ambient-glow::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background-image: var(--ambient-glow-card);
+    background-repeat: no-repeat;
+    pointer-events: none;
+    z-index: 0;
+    transition: opacity var(--transition-base);
+  }
+
+  .panel-ambient-primary::before {
+    background-image: var(--ambient-glow-primary);
+  }
+
+  .panel-ambient-cyan::before {
+    background-image: var(--ambient-glow-cyan);
+  }
+
+  .panel-ambient-success::before {
+    background-image: var(--ambient-glow-success);
+  }
+
+  .panel-ambient-danger::before {
+    background-image: var(--ambient-glow-danger);
+  }
+
+  .panel-ambient-violet::before {
+    background-image: var(--ambient-glow-violet);
+  }
+
+  /* Shimmer skeleton loader utilizing defined gradient tokens */
+  .skeleton-finora {
+    background: var(--skeleton-shimmer-gradient);
+    background-size: 200% 100%;
+    animation: finoraShimmer 2.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  /* Table Header Subtle Linear Gradient Bottom Border */
+  .table-header-gradient-border {
+    position: relative;
+    border-bottom: 1px solid transparent !important;
+    background-image: var(--table-header-border-gradient) !important;
+    background-position: bottom left !important;
+    background-size: 100% 1px !important;
+    background-repeat: no-repeat !important;
+  }
+
+  .table-header-gradient-border tr,
+  thead.table-header-gradient-border tr,
+  tr.table-header-gradient-border {
+    border-bottom: 1px solid transparent !important;
+    background-image: var(--table-header-border-gradient) !important;
+    background-position: bottom left !important;
+    background-size: 100% 1px !important;
+    background-repeat: no-repeat !important;
+  }
+
+  .table-header-gradient-border th,
+  thead.table-header-gradient-border th,
+  tr.table-header-gradient-border th {
+    border-bottom: 1px solid transparent !important;
+    background-clip: padding-box;
+  }
+
+  /* Active Series Subtle Outer Drop-Shadow & Glow (0.15 - 0.20 Opacity) */
+  .chart-series-glow-primary,
+  .chart-series-glow-primary path.recharts-curve,
+  .chart-series-glow-primary .recharts-area-curve {
+    filter: var(--chart-glow-primary);
+  }
+
+  .chart-series-glow-cyan,
+  .chart-series-glow-cyan path.recharts-curve,
+  .chart-series-glow-cyan .recharts-area-curve {
+    filter: var(--chart-glow-cyan);
+  }
+
+  .chart-series-glow-violet,
+  .chart-series-glow-violet path.recharts-curve,
+  .chart-series-glow-violet .recharts-area-curve {
+    filter: var(--chart-glow-violet);
   }
 
   .animate-fade-in {
@@ -223,6 +415,13 @@
     background-clip: text;
   }
 
+  .text-gradient-cyan {
+    background: var(--gradient-cyan);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
   /* Finora OS Typography Hierarchy */
   .page-title {
     @apply text-2xl sm:text-[28px] font-semibold tracking-tight text-foreground leading-tight;
@@ -242,6 +441,29 @@
 
   .metric-value {
     @apply text-2xl sm:text-3xl font-semibold tracking-tight tabular-nums text-foreground;
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes finoraShimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 

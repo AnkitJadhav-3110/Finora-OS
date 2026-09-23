@@ -1,6 +1,6 @@
 import { Helmet } from 'react-helmet-async';
-import { useState, useCallback } from 'react';
-import { Plus, Building2, Pencil, Trash2 } from 'lucide-react';
+import { useState, useCallback, useMemo } from 'react';
+import { Plus, Building2, Pencil, Trash2, CheckCircle2, Mail, Phone, MapPin, Palette, Check, Globe } from 'lucide-react';
 import { useDataSync } from '@/hooks/useDataSync';
 import { useStore } from '@/store/useStore';
 import { PageHeader } from '@/components/ui/page-header';
@@ -8,11 +8,13 @@ import { EmptyState } from '@/components/ui/empty-state';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
@@ -146,6 +148,10 @@ export default function BusinessPage() {
     toast.success('Business deleted');
   };
 
+  const activeBusiness = useMemo(() => {
+    return businesses.find(b => b.id === currentBusinessId) || businesses[0];
+  }, [businesses, currentBusinessId]);
+
   return (
     <>
       <Helmet>
@@ -154,263 +160,362 @@ export default function BusinessPage() {
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
       <div className="space-y-6 animate-slide-up">
-      <PageHeader
-        title="Business Profiles"
-        description="Manage your company information"
-        action={
-          <Button onClick={() => handleOpenDialog()} className="gap-2">
-            <Plus className="w-4 h-4" />
-            Add Business
-          </Button>
-        }
-      />
-
-      {businesses.length === 0 ? (
-        <EmptyState
-          icon={Building2}
-          title="No business profiles"
-          description="Add your first business profile to start creating invoices"
-          action={{
-            label: 'Add Business',
-            onClick: () => handleOpenDialog(),
-          }}
+        <PageHeader
+          title="Business Profiles"
+          description="Manage corporate entities, tax identifiers, brand assets, and default styling for generated invoices"
+          action={
+            <Button onClick={() => handleOpenDialog()} size="sm" className="gap-2">
+              <Plus className="w-3.5 h-3.5" />
+              Add Business
+            </Button>
+          }
         />
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {businesses.map(business => (
-            <Card
-              key={business.id}
-              className={cn(
-                "shadow-card hover:shadow-lg transition-all cursor-pointer",
-                currentBusinessId === business.id && "ring-2 ring-primary"
-              )}
-              onClick={() => setCurrentBusiness(business.id)}
-            >
-              <CardContent className="p-6">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center gap-4">
-                    {business.logo ? (
-                      <img
-                        src={business.logo}
-                        alt={business.name}
-                        className="w-14 h-14 rounded-lg object-cover"
-                      />
-                    ) : (
-                      <div
-                        className="w-14 h-14 rounded-lg flex items-center justify-center"
-                        style={{ backgroundColor: business.accentColor + '20' }}
-                      >
-                        <Building2 className="w-7 h-7" style={{ color: business.accentColor }} />
-                      </div>
-                    )}
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-semibold text-foreground">{business.name}</h3>
-                        {currentBusinessId === business.id && (
-                          <span className="text-xs bg-primary text-primary-foreground px-2 py-0.5 rounded-full">
-                            Active
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-sm text-muted-foreground">{business.email}</p>
-                    </div>
-                  </div>
-                  <div className="flex gap-1">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleOpenDialog(business);
-                      }}
-                    >
-                      <Pencil className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDelete(business.id);
-                      }}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
 
-                <div className="space-y-2 text-sm text-muted-foreground">
-                  <p>{business.address}</p>
-                  <p>{business.city}, {business.country}</p>
-                  <p>{business.phone}</p>
-                  {business.taxId && <p>Tax ID: {business.taxId}</p>}
-                </div>
+        {/* Business Metrics Row */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <Card className="shadow-sm border-border/80">
+            <CardContent className="p-4 flex items-center gap-3.5">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                <Building2 className="w-5 h-5" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Registered Entities</p>
+                <p className="text-base font-semibold text-foreground tracking-tight">
+                  {businesses.length} <span className="text-xs font-normal text-muted-foreground">profiles configured</span>
+                </p>
+              </div>
+            </CardContent>
+          </Card>
 
-                <div className="mt-4 pt-4 border-t border-border flex items-center gap-4">
-                  <div className="flex items-center gap-2">
-                    <div
-                      className="w-4 h-4 rounded-full"
-                      style={{ backgroundColor: business.accentColor }}
-                    />
-                    <span className="text-xs text-muted-foreground">Accent</span>
-                  </div>
-                  <div className="text-xs text-muted-foreground capitalize">
-                    Font: {business.font}
-                  </div>
+          <Card className="shadow-sm border-border/80">
+            <CardContent className="p-4 flex items-center gap-3.5">
+              <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-600 shrink-0">
+                <CheckCircle2 className="w-5 h-5" />
+              </div>
+              <div className="min-w-0 truncate">
+                <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Active Workspace Entity</p>
+                <p className="text-base font-semibold text-foreground tracking-tight truncate">
+                  {activeBusiness?.name || 'No Entity Active'}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="shadow-sm border-border/80">
+            <CardContent className="p-4 flex items-center gap-3.5">
+              <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center text-muted-foreground shrink-0">
+                <Palette className="w-5 h-5" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Active Brand Preset</p>
+                <div className="flex items-center gap-2 mt-0.5">
+                  <div
+                    className="w-3.5 h-3.5 rounded-full border border-border/60 shrink-0"
+                    style={{ backgroundColor: activeBusiness?.accentColor || '#3b82f6' }}
+                  />
+                  <p className="text-sm font-semibold text-foreground tracking-tight capitalize">
+                    {activeBusiness?.font || 'Inter'}
+                  </p>
                 </div>
-              </CardContent>
-            </Card>
-          ))}
+              </div>
+            </CardContent>
+          </Card>
         </div>
-      )}
 
-      {/* Add/Edit Dialog */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>{editingBusiness ? 'Edit Business' : 'Add New Business'}</DialogTitle>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            {/* Logo Upload */}
-            <FormField label="Company Logo">
-              <FileUpload
-                value={formData.logo}
-                onChange={(value) => handleFieldChange('logo', value)}
-                label="Upload logo"
-                previewType="square"
-              />
-            </FormField>
+        {businesses.length === 0 ? (
+          <EmptyState
+            icon={Building2}
+            title="No business profiles"
+            description="Add your first business profile to start creating invoices"
+            action={{
+              label: 'Add Business',
+              onClick: () => handleOpenDialog(),
+            }}
+          />
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {businesses.map(business => {
+              const isActive = currentBusinessId === business.id;
+              return (
+                <Card
+                  key={business.id}
+                  className={cn(
+                    "shadow-sm border transition-all cursor-pointer overflow-hidden",
+                    isActive ? "border-primary/80 ring-1 ring-primary/40 bg-card" : "border-border/70 hover:border-border bg-card"
+                  )}
+                  onClick={() => setCurrentBusiness(business.id)}
+                >
+                  <CardContent className="p-5 space-y-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-center gap-3.5 min-w-0">
+                        {business.logo ? (
+                          <img
+                            src={business.logo}
+                            alt={business.name}
+                            className="w-12 h-12 rounded-lg object-cover border border-border/60 shrink-0"
+                          />
+                        ) : (
+                          <div
+                            className="w-12 h-12 rounded-lg flex items-center justify-center shrink-0 border border-border/60"
+                            style={{ backgroundColor: business.accentColor + '15' }}
+                          >
+                            <Building2 className="w-6 h-6" style={{ color: business.accentColor }} />
+                          </div>
+                        )}
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2">
+                            <h3 className="text-sm font-semibold text-foreground truncate">{business.name}</h3>
+                            {isActive && (
+                              <Badge className="text-[10px] py-0 px-1.5 h-4.5 font-normal">
+                                Active Entity
+                              </Badge>
+                            )}
+                          </div>
+                          <p className="text-xs text-muted-foreground truncate">{business.email}</p>
+                        </div>
+                      </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <FormInput
-                label="Business Name"
-                required
-                value={formData.name}
-                onChange={(e) => handleFieldChange('name', e.target.value)}
-                onBlur={() => validateField('name', formData.name)}
-                placeholder="Your Company"
-                error={errors.name}
-              />
-              <FormInput
-                label="Email"
-                required
-                type="email"
-                value={formData.email}
-                onChange={(e) => handleFieldChange('email', e.target.value)}
-                onBlur={() => validateField('email', formData.email)}
-                placeholder="hello@company.com"
-                error={errors.email}
-              />
-            </div>
+                      <div className="flex items-center gap-1 shrink-0" onClick={e => e.stopPropagation()}>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                          onClick={() => handleOpenDialog(business)}
+                          title="Edit profile"
+                        >
+                          <Pencil className="w-3.5 h-3.5" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                          onClick={() => handleDelete(business.id)}
+                          title="Delete profile"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </Button>
+                      </div>
+                    </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <FormInput
-                label="Phone"
-                value={formData.phone}
-                onChange={(e) => handleFieldChange('phone', e.target.value)}
-                placeholder="+1 (555) 000-0000"
-                error={errors.phone}
-              />
-              <FormInput
-                label="Tax ID"
-                value={formData.taxId}
-                onChange={(e) => handleFieldChange('taxId', e.target.value)}
-                placeholder="XX-XXXXXXX"
-                error={errors.taxId}
-              />
-            </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-muted-foreground pt-1">
+                      <div className="flex items-center gap-2 truncate">
+                        <MapPin className="w-3.5 h-3.5 text-muted-foreground/70 shrink-0" />
+                        <span className="truncate">{business.city ? `${business.city}, ${business.country}` : (business.address || 'Address unassigned')}</span>
+                      </div>
+                      <div className="flex items-center gap-2 truncate">
+                        <Phone className="w-3.5 h-3.5 text-muted-foreground/70 shrink-0" />
+                        <span className="truncate">{business.phone || 'No phone recorded'}</span>
+                      </div>
+                    </div>
 
-            <FormInput
-              label="Address"
-              value={formData.address}
-              onChange={(e) => handleFieldChange('address', e.target.value)}
-              placeholder="123 Business Street"
-              error={errors.address}
-            />
+                    <div className="pt-3 border-t border-border/50 flex flex-wrap items-center justify-between gap-2 text-xs">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[11px] text-muted-foreground">Tax Identifier:</span>
+                        <Badge variant="outline" className="text-[10px] font-mono py-0 px-1.5">
+                          {business.taxId || 'Not Set'}
+                        </Badge>
+                      </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <FormInput
-                label="City"
-                value={formData.city}
-                onChange={(e) => handleFieldChange('city', e.target.value)}
-                placeholder="New York, NY 10001"
-                error={errors.city}
-              />
-              <FormInput
-                label="Country"
-                value={formData.country}
-                onChange={(e) => handleFieldChange('country', e.target.value)}
-                placeholder="United States"
-                error={errors.country}
-              />
-            </div>
+                      <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
+                        <div className="flex items-center gap-1.5">
+                          <div
+                            className="w-3 h-3 rounded-full border border-border"
+                            style={{ backgroundColor: business.accentColor }}
+                          />
+                          <span>{business.accentColor}</span>
+                        </div>
+                        <span>•</span>
+                        <span className="capitalize">{business.font}</span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        )}
 
-            <div className="grid grid-cols-2 gap-4">
-              <FormField label="Accent Color" error={errors.accentColor}>
-                <div className="flex gap-2">
-                  <Input
-                    type="color"
-                    value={formData.accentColor}
-                    onChange={(e) => handleFieldChange('accentColor', e.target.value)}
-                    className="w-12 h-10 p-1 cursor-pointer"
+        {/* Add/Edit Dialog */}
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="text-base font-semibold">
+                {editingBusiness ? 'Edit Business Profile' : 'Add Business Profile'}
+              </DialogTitle>
+              <DialogDescription className="text-xs">
+                Configure corporate identity, tax registration, address, and invoice branding presets
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-5 py-3">
+              {/* Group 1: Corporate Identity */}
+              <div className="space-y-3 p-3.5 rounded-lg border border-border/70 bg-muted/15">
+                <div className="flex items-center gap-2">
+                  <Building2 className="w-4 h-4 text-primary" />
+                  <h4 className="text-xs font-semibold text-foreground uppercase tracking-wider">Corporate Identity</h4>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <FormInput
+                    label="Business Name"
+                    required
+                    value={formData.name}
+                    onChange={(e) => handleFieldChange('name', e.target.value)}
+                    onBlur={() => validateField('name', formData.name)}
+                    placeholder="e.g. Acme Corporation Ltd"
+                    error={errors.name}
                   />
-                  <Input
-                    value={formData.accentColor}
-                    onChange={(e) => handleFieldChange('accentColor', e.target.value)}
-                    onBlur={() => validateField('accentColor', formData.accentColor)}
-                    className={cn("flex-1", errors.accentColor && "border-destructive")}
+                  <FormInput
+                    label="Email Address"
+                    required
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => handleFieldChange('email', e.target.value)}
+                    onBlur={() => validateField('email', formData.email)}
+                    placeholder="billing@acme.com"
+                    error={errors.email}
                   />
                 </div>
-              </FormField>
-              <FormField label="Font">
-                <Select
-                  value={formData.font}
-                  onValueChange={(value) =>
-                    setFormData({ ...formData, font: value as 'inter' | 'roboto' | 'poppins' })
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="inter">Inter</SelectItem>
-                    <SelectItem value="roboto">Roboto</SelectItem>
-                    <SelectItem value="poppins">Poppins</SelectItem>
-                  </SelectContent>
-                </Select>
-              </FormField>
+                <FormInput
+                  label="Phone Number"
+                  value={formData.phone}
+                  onChange={(e) => handleFieldChange('phone', e.target.value)}
+                  placeholder="+1 (555) 000-0000"
+                  error={errors.phone}
+                />
+              </div>
+
+              {/* Group 2: Tax & Physical Presence */}
+              <div className="space-y-3 p-3.5 rounded-lg border border-border/70 bg-muted/15">
+                <div className="flex items-center gap-2">
+                  <MapPin className="w-4 h-4 text-primary" />
+                  <h4 className="text-xs font-semibold text-foreground uppercase tracking-wider">Tax & Location</h4>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <FormInput
+                    label="Tax ID / GSTIN / VAT Number"
+                    value={formData.taxId}
+                    onChange={(e) => handleFieldChange('taxId', e.target.value)}
+                    placeholder="XX-XXXXXXX"
+                    error={errors.taxId}
+                  />
+                  <FormInput
+                    label="Country"
+                    value={formData.country}
+                    onChange={(e) => handleFieldChange('country', e.target.value)}
+                    placeholder="United States"
+                    error={errors.country}
+                  />
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <FormInput
+                    label="Street Address"
+                    value={formData.address}
+                    onChange={(e) => handleFieldChange('address', e.target.value)}
+                    placeholder="123 Business Boulevard, Suite 400"
+                    error={errors.address}
+                  />
+                  <FormInput
+                    label="City & State / Region"
+                    value={formData.city}
+                    onChange={(e) => handleFieldChange('city', e.target.value)}
+                    placeholder="San Francisco, CA 94105"
+                    error={errors.city}
+                  />
+                </div>
+              </div>
+
+              {/* Group 3: Brand & Invoice Styling */}
+              <div className="space-y-3 p-3.5 rounded-lg border border-border/70 bg-muted/15">
+                <div className="flex items-center gap-2">
+                  <Palette className="w-4 h-4 text-primary" />
+                  <h4 className="text-xs font-semibold text-foreground uppercase tracking-wider">Branding & Layout</h4>
+                </div>
+
+                <FormField label="Company Logo">
+                  <FileUpload
+                    value={formData.logo}
+                    onChange={(value) => handleFieldChange('logo', value)}
+                    label="Upload company logo (PNG, JPG, SVG)"
+                    previewType="square"
+                  />
+                </FormField>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <FormField label="Accent Color" error={errors.accentColor}>
+                    <div className="flex gap-2">
+                      <Input
+                        type="color"
+                        value={formData.accentColor}
+                        onChange={(e) => handleFieldChange('accentColor', e.target.value)}
+                        className="w-12 h-9 p-1 cursor-pointer shrink-0"
+                      />
+                      <Input
+                        value={formData.accentColor}
+                        onChange={(e) => handleFieldChange('accentColor', e.target.value)}
+                        onBlur={() => validateField('accentColor', formData.accentColor)}
+                        className={cn("flex-1 h-9 text-xs", errors.accentColor && "border-destructive")}
+                      />
+                    </div>
+                  </FormField>
+
+                  <FormField label="Default Typography Font">
+                    <Select
+                      value={formData.font}
+                      onValueChange={(value) =>
+                        setFormData({ ...formData, font: value as 'inter' | 'roboto' | 'poppins' })
+                      }
+                    >
+                      <SelectTrigger className="h-9 text-xs">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="inter">Inter (Clean Modern Sans)</SelectItem>
+                        <SelectItem value="roboto">Roboto (Industrial Standard)</SelectItem>
+                        <SelectItem value="poppins">Poppins (Geometric Rounded)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormField>
+                </div>
+              </div>
+
+              {/* Group 4: Digital Signature & Footer Defaults */}
+              <div className="space-y-3 p-3.5 rounded-lg border border-border/70 bg-muted/15">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-primary" />
+                  <h4 className="text-xs font-semibold text-foreground uppercase tracking-wider">Authentication & Footer</h4>
+                </div>
+
+                <FormField label="Digital Signature / Authorized Signatory">
+                  <FileUpload
+                    value={formData.signature}
+                    onChange={(value) => handleFieldChange('signature', value)}
+                    label="Upload authorized signature image"
+                    previewType="wide"
+                  />
+                </FormField>
+
+                <FormTextarea
+                  label="Default Invoice Footer Note"
+                  value={formData.footerText}
+                  onChange={(e) => handleFieldChange('footerText', e.target.value)}
+                  placeholder="Thank you for your business! Payment terms are 30 days from invoice date."
+                  rows={2}
+                  error={errors.footerText}
+                />
+              </div>
             </div>
 
-            {/* Signature Upload */}
-            <FormField label="Digital Signature">
-              <FileUpload
-                value={formData.signature}
-                onChange={(value) => handleFieldChange('signature', value)}
-                label="Upload signature"
-                previewType="wide"
-              />
-            </FormField>
-
-            <FormTextarea
-              label="Footer Text"
-              value={formData.footerText}
-              onChange={(e) => handleFieldChange('footerText', e.target.value)}
-              placeholder="Thank you for your business!"
-              rows={2}
-              error={errors.footerText}
-            />
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleSave}>
-              {editingBusiness ? 'Update' : 'Add'} Business
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </div>
+            <DialogFooter>
+              <Button variant="outline" size="sm" onClick={() => setIsDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button size="sm" onClick={handleSave}>
+                {editingBusiness ? 'Update Profile' : 'Save Business'}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
     </>
   );
 }
